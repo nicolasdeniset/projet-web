@@ -1,0 +1,269 @@
+body {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+}
+
+#shadow {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1600px;
+	height: 900px;
+	z-index: 1;
+	background-color: gray;
+	opacity: 0.6;
+}
+
+#startRound {
+	display: none;
+	width: 100%;
+	height: 100%;
+}
+
+#startRound p {
+	position: absolute;
+	left: 30%;
+	top: 10%;
+	z-index: 2;
+	font-size: 40px;
+	font-weight: bold;
+	font-style: italic;
+}
+
+#syllabe1 {
+	position: absolute;
+	width: 25%;
+	height: 25%;
+	left: 10%;
+	top: 25%;
+	z-index: 2;
+	border-radius: 10px;
+	border: solid 3px #000;
+	background-color: white;
+}
+
+#syllabe1 p {
+	position: absolute;
+	left: 40%;
+	top: -30%;
+	font-size: 80px;
+	font-weight: bold;
+	font-style: italic;
+}
+
+#syllabe2 {
+	position: absolute;
+	width: 25%;
+	height: 25%;
+	left: 40%;
+	top: 25%;
+	z-index: 2;
+	border-radius: 10px;
+	border: solid 3px #000;
+	background-color: white;
+}
+
+#syllabe2 p {
+	position: absolute;
+	left: 40%;
+	top: -30%;
+	font-size: 80px;
+	font-weight: bold;
+	font-style: italic;
+}
+
+#syllabe3 {
+	position: absolute;
+	width: 25%;
+	height: 25%;
+	left: 70%;
+	top: 25%;
+	z-index: 2;
+	border-radius: 10px;
+	border: solid 3px #000;
+	background-color: white;
+}
+
+#syllabe3 p {
+	position: absolute;
+	left: 40%;
+	top: -30%;
+	font-size: 80px;
+	font-weight: bold;
+	font-style: italic;
+}
+
+header {
+	position: absolute;
+	left: 100px;
+	height: 100px;
+	width: 1500px;
+	background-color: red;
+}
+
+aside {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	height: 700px;
+	width: 300px;
+	background-color: green;
+}
+
+main {
+	position: absolute;
+	top: 100px;
+	left: 400px;
+	height: 700px;
+	width: 800px;
+	background-color: blue;
+}
+
+section {
+	position: absolute;
+	top: 100px;
+	left: 1200px;
+	height: 700px;
+	width: 400px;
+	background-color: black;
+}
+
+footer {
+	position: absolute;
+	top: 800px;
+	left: 100px;
+	height: 100px;
+	width: 1500px;
+	background-color: yellow;
+}
+
+#mot {
+	position: absolute;
+	top: 50px;
+	left: 1000px;
+	height: 50px;
+	width: 100px;
+	border-radius: 10px;
+	border: solid 3px #000;
+	background-color: white;	
+}
+
+#mot p {
+	position: absolute;
+	bottom: -50%;
+	left: 30%;
+	font-size: 30px;
+	font-weight: bold;
+	font-style: italic;	
+}
+
+#toolbox {
+	position: absolute;
+	top: 650px;
+	height: 50px;
+	width: 800px;
+	background-color: grey;	
+}
+
+#gomme {
+	display: none;
+}
+
+#trait {
+	display: none;
+}
+
+label {
+	border:1px solid grey;
+	display:inline-block;
+}
+
+#toolbox label[for=trait] {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	height: 30px;
+	width: 30px;
+	background-image: url("../images/icone-pinceau.png");
+	background-size: cover;
+}
+
+#toolbox label[for=gomme] {
+	position: absolute;
+	top: 10px;
+	left: 50px;
+	height: 30px;
+	width: 30px;
+	background-image: url("../images/icone-gomme.png");
+	background-size: cover;
+}
+
+#toolbox input[type=range] {
+	position: absolute;
+	top: 10px;
+	left: 80px;
+}
+
+#toolbox input:checked + label[for] {
+	box-shadow: blue 0 0 5px;
+}  
+
+#clear {
+	position: absolute;
+	top: 10px;
+	left: 700px;
+	height: 30px;
+	width: 30px;
+	background-image: url("../images/icone-supprimer.png");
+	background-color: white;
+	background-size: cover;
+	border: solid 1px #000;
+}
+
+#help {
+	position: absolute;
+	top: 10px;
+	left: 600px;
+	height: 30px;
+	width: 30px;
+	background-image: url("../images/icone-help.png");
+	background-color: white;
+	background-size: cover;
+	border: solid 1px #000;
+}
+
+#chat {
+	position: absolute;
+	top: 650px;
+	height: 50px;
+	width: 400px;
+	background-color: white;
+}
+
+#content {
+	position: absolute;
+	top: 0; 
+	left: 0;
+	width: 800px;
+	height: 650px;
+	background-color: white;
+}
+
+#content canvas {
+	position: absolute;
+	top: 0; 
+	left: 0;
+	cursor: none;
+	border: solid 1px #000;
+	width: 800px;
+	height: 650px;
+}
+#content canvas#overlay {
+	opacity: 0.8;
+}
+#content canvas#dessin {
+	background-size: 50px 50px;
+	background-repeat: repeat;
+}

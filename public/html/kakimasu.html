@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Kakimasu !</title>
+	<link rel="stylesheet" href="../styles/kakimasu.css">
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="../js/kakimasu.js"></script>
+</head>
+
+<body>
+	<div id="startRound">
+		<p>Choisissez une syllabe à dessiner:</p>
+		<div id="syllabe1"></div>
+		<div id="syllabe2"></div>
+		<div id="syllabe3"></div>
+	</div>
+
+	<div id="shadow"></div>
+
+	<header>
+		<div id="mot">
+		</div>
+	</header>
+
+	<aside>
+	</aside>
+
+	<main>
+		<div id="content">     
+			<canvas id="dessin" width="800" height="650"></canvas>
+			<canvas id="overlay" width="800" height="650"></canvas>
+		</div>
+		<div id="toolbox">
+			<input type="radio" name="outil" id="trait" checked> <label for="trait"></label>
+			<input type="radio" name="outil" id="gomme"> <label for="gomme"></label>
+			<input type="range" id="size" min="1" max="50" value="5">
+			<div id="clear"></div>
+			<div id="help"></div>
+		</div>
+	</main>
+
+	<section>
+		<div id="chat">
+			<input type="text" id="monMessage">
+			<input type="button" value="Envoyer" id="btnEnvoyer">
+		</div>
+	</section>
+
+
+	<footer>
+	</footer>
+</body>
+</html>
