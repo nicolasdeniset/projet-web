@@ -15,7 +15,6 @@
 		<div id="syllabe2"></div>
 		<div id="syllabe3"></div>
 	</div>
-
 	<div id="shadow"></div>
 
 	<header>
@@ -29,23 +28,26 @@
 	<main>
 		<div id="content">     
 			<canvas id="dessin" width="800" height="650"></canvas>
+			<canvas id="showhelp" width="800" height="650"></canvas>
 			<canvas id="overlay" width="800" height="650"></canvas>
+			
 		</div>
 		<div id="toolbox">
 			<input type="radio" name="outil" id="trait" checked> <label for="trait"></label>
 			<input type="radio" name="outil" id="gomme"> <label for="gomme"></label>
-			<input type="range" id="size" min="1" max="50" value="5">
+			<input type="range" id="size" min="1" max="50" value="30">
 			<div id="clear"></div>
 			<div id="help"></div>
 		</div>
 	</main>
 
 	<section>
-		<div id="chat">
-			<input type="text" id="monMessage">
-			<input type="button" value="Envoyer" id="btnEnvoyer">
-		</div>
+
 	</section>
+	<div id="chat">
+		<input type="text" id="monMessage">
+		<input type="button" value="Envoyer" id="btnEnvoyer">
+	</div>
 
 
 	<footer>
