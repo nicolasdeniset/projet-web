@@ -20,7 +20,75 @@
 	<header>
 		<div id="mot">
 		</div>
+		<div id="textPseudo">
+			Vous devez entrer votre pseudo avant de rejoindre une partie !
+		</div>
 	</header>
+	<form id="options">
+	<input id="pseudo" type="text" placeholder="Entrez votre nom" maxlength="16">
+	<div id="avatar"></div>
+	<div id="choixAlphabet">
+		<p>Choisissez l'alphabet :</p>
+		<label><input type="radio" name="radGlyphe" value="hiragana" checked> hiragana</label>
+		<label><input type="radio" name="radGlyphe" value="katakana"> katakana</label>
+		<label><input type="radio" name="radGlyphe" value="les2"> les deux</label>
+        </div>
+	<div id="suffixes">
+            <p>Suffixes :</p> 
+            <label><input type="checkbox" value="[b-z]{1,2}a"> .a</label>
+            <label><input type="checkbox" value="[b-z]{1,2}i"> .i</label>
+            <label><input type="checkbox" value="[b-z]{1,2}u"> .u</label>
+            <label><input type="checkbox" value="[b-z]{1,2}e"> .e</label>
+            <label><input type="checkbox" value="[b-z]{1,2}o"> .o</label>
+        </div>
+        <div id="prefixes">
+            <p>Préfixes :</p> 
+            <table>
+                <tr>
+                    <td><label><input type="checkbox" value="[kg][aiueo]"> k. g.</label></td>
+                    <td><label><input type="checkbox" value="[kzj].?[aiueo]"> s. z.</label></td>
+                    <td><label><input type="checkbox" value="[tcd].?[aiueo]"> t. d.</label></td>
+                </tr>
+                <tr>
+                    <td><label><input type="checkbox" value="n[aiueo]"> n.</label></td>
+                    <td><label><input type="checkbox" value="[hfbp][aiueo]"> h./f. b. p.</label></td>
+                    <td><label><input type="checkbox" value="m[aiueo]"> m.</label></td>
+                </tr>
+                <tr>
+                    <td><label><input type="checkbox" value="y[aiueo]"> y.</label></td>
+                    <td><label><input type="checkbox" value="r[aiueo]"> r.</label></td>
+                    <td><label><input type="checkbox" value="w[aiueo]"> w.</label></td>
+                </tr>
+            </table>
+        </div>
+	<div id="parametres">
+		<label>Nombre de tours</label>
+		<select id="rounds">
+			<option>3</option>
+			<option>4</option>
+			<option>5</option>
+			<option>6</option>
+			<option>7</option>
+			<option>8</option>
+			<option>9</option>
+			<option>10</option>
+		</select>
+		<br>
+		<label>Temps pour dessiner (secondes)</label>
+		<select id="time">
+			<option>30</option>
+			<option>60</option>
+			<option>90</option>
+			<option>120</option>
+		</select>
+		<br>
+		<input id="start" type="button" value="Commencez !">
+		<br>
+		<input id="back" type="button" value="Rejoindre une partie">
+	</div>
+	<input id="play" type="button" value="Jouez !">
+	<input id="create"  type="button" value="Créez votre salon !">
+	</form>
 
 	<aside>
 	</aside>
@@ -42,14 +110,11 @@
 	</main>
 
 	<section>
-
+		<div id="chat">
+			<input type="text" id="monMessage">
+			<input type="button" value="Envoyer" id="btnEnvoyer">
+		</div>
 	</section>
-	<div id="chat">
-		<input type="text" id="monMessage">
-		<input type="button" value="Envoyer" id="btnEnvoyer">
-	</div>
-
-
 	<footer>
 	</footer>
 </body>

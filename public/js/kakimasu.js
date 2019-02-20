@@ -1,22 +1,24 @@
 var socket = io.connect('http://localhost:8080');
-var user;
-var clients = {};
-var scores = {};
+var user; // Pseudo de l'utilisateur
+var clients = {}; // Liste des clients
+var scores = {}; // Liste des scores
+var rounds // Nombre de tours pour chaque partie
+var time // Temps de chaque tours de dessin
 
 var objGlyphes = null;
 var glyphes = [];
-var alphabet = (Math.random() < 0.5) ? 'hiragana' : 'katakana';
-var solution;
-var buttonPressed = false;
-var x = 0;
-var y = 0;
-var size = 30;
-var radCommande = "trait";
-var trait;
-var gomme;
+var alphabet; // Alphabet qui sera utilisé
+var solution; // Glyphe à trouver
+var buttonPressed = false; // si on clic sur le dessin
+var x = 0; // Position de la souris horizontale
+var y = 0; // Position de la souris verticale
+var size = 30; // Taille des outils de dessin
+var radCommande = "trait"; // Outils actuellement utilisé pour le dessin
+var trait; // Pinceau
+var gomme; // Gomme
 
 document.addEventListener("DOMContentLoaded", async function() {
-	//Alphabet
+	// Récupération des alphabets
 	if (typeof fetch !== undefined) {       
             // avec des promesses et l'instruction fetch
             var response = await fetch("../js/alphabet.json"); 
@@ -36,9 +38,20 @@ document.addEventListener("DOMContentLoaded", async function() {
             xhttp.open("GET", "../js/alphabet.json", true);
             xhttp.send();
         }
+	
+	// Fonctions liées a la connexion d'un nouvel utilisateur.
+	// Affichage du formulaire pour rejoindre une partie
+	joinGame();
+	// L'utilisateur souhaite rejoindre une partie
+	document.getElementById("play").addEventListener("click", recuperationInfo, false);
+	// L'utilisateur souhaite créer sa partie
+	//document.getElementById("create").addEventListener("click", createGame, false);
+	// Création de la partie de l'utilisateur
+	document.getElementById("start").addEventListener("click", recuperationInfo, false);
+	// L'utilisateur ne souhaite plus créer de partie. Affichage du premier formulaire
+	document.getElementById("back").addEventListener("click", joinGame, false);
 
-	//Chat
-	connect();
+	// Fonctions liées au Chat
 	document.getElementById("btnEnvoyer").addEventListener("click", send, false);
 	document.addEventListener("keypress", function(e) {
 		if(e.key === 'Enter') {
@@ -46,11 +59,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 		}
 	});
 
-	//Nouveau tour toutes les 30 secondes.
-	
-
-	//Dessin
-	socket.emit("go");
+	// Fonctions liées au Dessin
 	/*socket.on("startRound", function(p) {
 		console.log("test2");
 		user = p;
@@ -101,17 +110,81 @@ document.addEventListener("DOMContentLoaded", async function() {
 	});
 });
 
-//API Chat
-function connect() {
-	
-	user = "B";
-	//user = document.getElementById("pseudo").value;
-	//document.getElementById("logScreen").style.display = "none";
-	//document.getElementById("content").style.display = "block";
-	socket.emit("login", user);
-	recep();
+//API Connexion
+// Fonction qui affiche le formulaire pour rejoindre une partie
+function joinGame() {
+	// Affichage du formulaire pour rejoindre une partie
+	document.getElementById("suffixes").style.display = "none";
+	document.getElementById("prefixes").style.display = "none";
+	document.getElementById("parametres").style.display = "none";
+	document.getElementById("textPseudo").style.display = "none";
+	document.getElementById("play").style.display = "block";
+	document.getElementById("create").style.display = "block";
+	document.getElementById("mot").style.display = "none";
+	document.getElementsByTagName("ASIDE")[0].style.display = "none";
+	document.getElementsByTagName("MAIN")[0].style.display = "none";
+	document.getElementsByTagName("SECTION")[0].style.display = "none";
 }
 
+// Fonction qui permet de récuperer les éléments du formulaire
+function recuperationInfo() {
+	// Choix du pseudo de l'utilisateur
+	user = document.getElementById("pseudo").value;
+
+	// Choix de l'alphabet
+	alphabet = document.querySelector('#options input[name=radGlyphe]:checked').value;
+	// Si l'on souhaite utiliser les deux alphabets, un des deux sera choisi au hasard
+        if (alphabet == "les2") {
+            alphabet = (Math.random() < 0.5) ? 'hiragana' : 'katakana';   
+        }console.log(alphabet);
+
+	// Choix du nombre de tours
+	var selectRounds = document.getElementById("rounds");
+	for(var i=0; i<selectRounds.options.length; i++) {
+		if(selectRounds.options[i].selected) {
+			rounds = selectRounds.options[i].value;
+		}
+	}
+
+	// Choix du temps de chaque tours
+	var selectTime = document.getElementById("time");
+	for(var i=0; i<selectTime.options.length; i++) {
+		if(selectTime.options[i].selected) {
+			time = selectTime.options[i].value;
+		}
+	}
+
+	// Si l'utilisateur a un pseudo correcte on le connecte au serveur
+	if(user != "") {
+		// Affichage de la partie
+		document.getElementById("mot").style.display = "block";
+		document.getElementById("textPseudo").style.display = "none";
+		document.getElementById("options").style.display = "none";
+		document.getElementsByTagName("ASIDE")[0].style.display = "block";
+		document.getElementsByTagName("MAIN")[0].style.display = "block";
+		document.getElementsByTagName("SECTION")[0].style.display = "block";
+		// Connexion au serveur
+		connect();
+		// Suppression des événements du formulaire
+		document.getElementById("play").removeEventListener("click", recuperationInfo, false);
+		//document.getElementById("create").removeEventListener("click", createGame, false);
+		document.getElementById("start").removeEventListener("click", recuperationInfo, false);
+		document.getElementById("back").removeEventListener("click", joinGame, false);
+		// Lancement de la partie
+		socket.emit("go");
+	}
+	else {
+		document.getElementById("textPseudo").style.display = "block";
+	}
+}
+
+// Fonction qui permet de connecter l'utilisateur au serveur et qui envoie son pseudo au serveur
+function connect() {
+	socket.emit("login", user);
+	recep();
+}	
+
+//API Chat
 function recep() {	
 	socket.on("bienvenue", function(id) {
 		user = id;
@@ -281,6 +354,7 @@ function getThreeGlyphes(x,objGlyphes) {
 }
 
 function start() {
+	console.log(alphabet);
 	glyphes = getThreeGlyphes(alphabet,objGlyphes);
 	var startRound = document.getElementById("startRound");
 	var shadow = document.getElementById("shadow");
