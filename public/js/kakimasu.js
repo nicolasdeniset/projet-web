@@ -124,6 +124,7 @@ function joinGame() {
 	document.getElementsByTagName("ASIDE")[0].style.display = "none";
 	document.getElementsByTagName("MAIN")[0].style.display = "none";
 	document.getElementsByTagName("SECTION")[0].style.display = "none";
+	document.getElementById("chat").style.display = "none";
 }
 
 // Fonction qui permet de récuperer les éléments du formulaire
@@ -404,8 +405,8 @@ function displayElement(x,y) {
 	document.getElementById("size").style.display = x;
 	document.getElementById("clear").style.display = x;
 	document.getElementById("help").style.display = x;
-	document.getElementsByTagName("LABEL")[0].style.display = x;
-	document.getElementsByTagName("LABEL")[1].style.display = x;
+	document.getElementsByTagName("LABEL")[19].style.display = x;
+	document.getElementsByTagName("LABEL")[20].style.display = x;
 	document.getElementById("chat").style.display = y;
 }
 
