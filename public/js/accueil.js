@@ -71,5 +71,4 @@ function createGame() {
 	document.getElementById("parametres").style.display = "block";
 	document.getElementById("play").style.display = "none";
 	document.getElementById("create").style.display = "none";
-	console.log("yolo");
 }

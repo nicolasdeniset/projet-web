@@ -22,7 +22,12 @@ app.get('/', function(req, res) {
 /*** Gestion des clients et des connexions ***/
 
 var clients = {};       // id -> socket
-var scores = {};
+var scores = {};	// Liste des scores
+var joueurs = [];	// Tableau de joueurs
+var mot;	// Syllabe a trouver
+var player = 0; // Compteur pour savoir qui doit dessiner
+var rounds = 1; // Compteur du nombres de tours
+var time = 30; // Durée de chaques manches (en secondes)
 
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
@@ -41,6 +46,8 @@ io.on('connection', function (socket) {
         currentID = id;
         clients[currentID] = socket;
 		scores[currentID] = 0;
+        joueurs.push(currentID);
+        
         
         console.log("Nouvel utilisateur : " + currentID);
         // envoi d'un message de bienvenue à ce client
@@ -49,8 +56,12 @@ io.on('connection', function (socket) {
         socket.broadcast.emit("message", { from: null, to: null, text: currentID + " a rejoint la partie !", date: Date.now() } );
         // envoi de la nouvelle liste à tous les clients connectés 
         io.sockets.emit("liste", Object.keys(clients));
-		// envoi des scores à tous les clients
-		io.sockets.emit("score", Object.values(scores));
+	// envoi des scores à tous les clients
+	io.sockets.emit("score", Object.values(scores));
+	// envoi du nombres de tours
+	socket.emit("rounds", rounds);
+	// envoi du temps de chaques manches
+	socket.emit("temps", time);console.log(rounds);
     });
     
     
@@ -62,7 +73,7 @@ io.on('connection', function (socket) {
         console.log("Reçu message");   
         // si jamais la date n'existe pas, on la rajoute
         msg.date = Date.now();
-		console.log(msg.text +" "+ mot);
+		console.log(msg.text +"<- text mot ->"+ mot);
 		if ((msg.text > mot) || (msg.text < mot)) {
         	io.sockets.emit("message", msg);
 		}
@@ -79,39 +90,45 @@ io.on('connection', function (socket) {
     /** 
      *  Gestion du Jeu
      */
-	var mot;
-	
-	socket.on("go", function() {
-		var i = 0;
-		socket.emit("player", Object.keys(clients)[i]);
-		socket.on("mot", function(m) {
-			mot = m;
-		});
 		
+	socket.on("go", function() {
+        socket.emit("player", joueurs[0]);		
 	});
-	/*setInterval(function(){
-		if(clients[currentID] == clients[clients.length-1]) {
-			socket.broadcast.emit("startRound", Object.keys(clients)[0]);
-		}
-		else {
-			socket.broadcast.emit("startRound", Object.keys(clients)[currentID+1]);
-		}		
-	}, 30000);*/
-	socket.on("draw", function (data) {
+	socket.on("mot", function(m) {
+		mot = m;
+	});
+	socket.on("draw", function(data) {
 		clear_history = [];
 		arc_history.push(data);
 		socket.broadcast.emit("trait", arc_history);
 	});
-	socket.on("drawClear", function (data) {
+	socket.on("drawClear", function(data) {
 		arc_history = [];
 		clear_history.push(data);
 		socket.broadcast.emit("gomme", clear_history);
 	});
-	socket.on("newKaki", function () {
+	socket.on("newKaki", function() {
 		arc_history = [];
 		clear_history = [];
 		socket.broadcast.emit("newKaki");
 	});
+    socket.on("endRound", function() {
+        socket.broadcast.emit("message", { from: null, to: null, text: "Fin de la manche. Le mot était : "+ mot, date: Date.now() } );
+        if(player == joueurs.length-1) {
+		console.log("if");
+		rounds--;
+		if(rounds == 0){
+			io.sockets.emit("endGame");
+			return;
+		}
+		player = 0;
+	}
+	else {
+		player++;
+		console.log("else");
+	}
+		socket.broadcast.emit("player", joueurs[player]);
+    });
     
 
     /** 
@@ -128,6 +145,11 @@ io.on('connection', function (socket) {
                 { from: null, to: null, text: currentID + " a quitté la partie.", date: Date.now() } );
                 // suppression de l'entrée
             delete clients[currentID];
+            for (var i=0; i<joueurs.length; i++){
+                if(currendID == joueurs[i]) {
+                    joueurs.splice(i, 1);
+                }
+            }
             // envoi de la nouvelle liste pour mise à jour
             socket.broadcast.emit("liste", Object.keys(clients));
         }

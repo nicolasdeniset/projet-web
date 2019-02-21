@@ -2,11 +2,11 @@ var socket = io.connect('http://localhost:8080');
 var user; // Pseudo de l'utilisateur
 var clients = {}; // Liste des clients
 var scores = {}; // Liste des scores
-var rounds // Nombre de tours pour chaque partie
-var time // Temps de chaque tours de dessin
+var rounds; // Nombre de tours pour chaque partie
+var time; // Temps de chaque tours de dessin
 
-var objGlyphes = null;
-var glyphes = [];
+var objGlyphes = null; // Fichier json contenant les alphabets
+var glyphes = []; // Tableau de 3 glyphes
 var alphabet; // Alphabet qui sera utilisé
 var solution; // Glyphe à trouver
 var buttonPressed = false; // si on clic sur le dessin
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 	// L'utilisateur souhaite rejoindre une partie
 	document.getElementById("play").addEventListener("click", recuperationInfo, false);
 	// L'utilisateur souhaite créer sa partie
-	//document.getElementById("create").addEventListener("click", createGame, false);
+	document.getElementById("create").addEventListener("click", createGame, false);
 	// Création de la partie de l'utilisateur
 	document.getElementById("start").addEventListener("click", recuperationInfo, false);
 	// L'utilisateur ne souhaite plus créer de partie. Affichage du premier formulaire
@@ -58,19 +58,33 @@ document.addEventListener("DOMContentLoaded", async function() {
 			send();
 		}
 	});
-
-	// Fonctions liées au Dessin
-	/*socket.on("startRound", function(p) {
-		console.log("test2");
-		user = p;
-		newKaki();
-		socket.emit("go");
-		//window.location.reload(true);
-	});*/	
+	socket.on("endGame", function() {
+		var startRound = document.getElementById("startRound");
+		var shadow = document.getElementById("shadow");
+		shadow.style.display = "block";
+		startRound.style.display = "block";
+		startRound.innerHTML = "<p>Fin de la partie ! Le gagnant est :<br>Moi ! haha</p>";
+	});
 	socket.on("player", function(p) {
 		if (user == p) {
 			displayElement("block","none");
 			start();
+			var timeout = setTimeout(function() {
+				socket.emit("endRound");
+				document.removeEventListener("mousedown", buttonDown);
+					    document.removeEventListener("mouseup", buttonRelease);
+				document.removeEventListener("mouseout", function(e) {
+						    var overlay = document.getElementById("overlay");
+						    var overlayContext = overlay.getContext("2d");
+						    overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+					    });
+				var mot = document.getElementById("mot");
+					mot.innerHTML = "<p></p>";
+				solution = null;
+				displayElement("none","block");
+				newKaki();
+				buttonPressed = false;
+			}, time * 1000);
 			document.getElementById("clear").addEventListener("click", newKaki, false);
 			document.getElementById("help").addEventListener("click", helpKaki, false);
 			document.addEventListener("mousedown", buttonDown);
@@ -127,6 +141,15 @@ function joinGame() {
 	document.getElementById("chat").style.display = "none";
 }
 
+// Fonction qui permet d'afficher le formulaire de création de partie
+function createGame() {
+	document.getElementById("suffixes").style.display = "block";
+	document.getElementById("prefixes").style.display = "block";
+	document.getElementById("parametres").style.display = "block";
+	document.getElementById("play").style.display = "none";
+	document.getElementById("create").style.display = "none";
+}
+
 // Fonction qui permet de récuperer les éléments du formulaire
 function recuperationInfo() {
 	// Choix du pseudo de l'utilisateur
@@ -137,23 +160,23 @@ function recuperationInfo() {
 	// Si l'on souhaite utiliser les deux alphabets, un des deux sera choisi au hasard
         if (alphabet == "les2") {
             alphabet = (Math.random() < 0.5) ? 'hiragana' : 'katakana';   
-        }console.log(alphabet);
+        }
 
 	// Choix du nombre de tours
-	var selectRounds = document.getElementById("rounds");
+	/*var selectRounds = document.getElementById("rounds");
 	for(var i=0; i<selectRounds.options.length; i++) {
 		if(selectRounds.options[i].selected) {
 			rounds = selectRounds.options[i].value;
 		}
-	}
+	}*/
 
 	// Choix du temps de chaque tours
-	var selectTime = document.getElementById("time");
+	/*var selectTime = document.getElementById("time");
 	for(var i=0; i<selectTime.options.length; i++) {
 		if(selectTime.options[i].selected) {
 			time = selectTime.options[i].value;
 		}
-	}
+	}*/
 
 	// Si l'utilisateur a un pseudo correcte on le connecte au serveur
 	if(user != "") {
@@ -168,7 +191,7 @@ function recuperationInfo() {
 		connect();
 		// Suppression des événements du formulaire
 		document.getElementById("play").removeEventListener("click", recuperationInfo, false);
-		//document.getElementById("create").removeEventListener("click", createGame, false);
+		document.getElementById("create").removeEventListener("click", createGame, false);
 		document.getElementById("start").removeEventListener("click", recuperationInfo, false);
 		document.getElementById("back").removeEventListener("click", joinGame, false);
 		// Lancement de la partie
@@ -203,6 +226,12 @@ function recep() {
 	socket.on("score", function(s) {
 		scores = s;
 		getList(clients, scores);
+	});
+	socket.on("temps", function(t) {
+		time = t;
+	});
+	socket.on("rounds", function(r) {
+		rounds = r;
 	});
 }
 
@@ -355,7 +384,6 @@ function getThreeGlyphes(x,objGlyphes) {
 }
 
 function start() {
-	console.log(alphabet);
 	glyphes = getThreeGlyphes(alphabet,objGlyphes);
 	var startRound = document.getElementById("startRound");
 	var shadow = document.getElementById("shadow");
@@ -374,6 +402,7 @@ function start() {
 		var mot = document.getElementById("mot");
 		mot.innerHTML = "<p>"+glyphes[rand].key+"</p>";
 		solution = glyphes[rand];
+		socket.emit("mot",solution.key);
 	}, 10000);
 	syllabe1.addEventListener("click", function() {
 		clearTimeout(time);
@@ -382,6 +411,7 @@ function start() {
 		var mot = document.getElementById("mot");
 		mot.innerHTML = "<p>"+glyphes[0].key+"</p>";
 		solution = glyphes[0];
+		socket.emit("mot",solution.key);
 	});
 	syllabe2.addEventListener("click", function() {
 		clearTimeout(time);
@@ -390,6 +420,7 @@ function start() {
 		var mot = document.getElementById("mot");
 		mot.innerHTML = "<p>"+glyphes[1].key+"</p>";
 		solution = glyphes[1];
+		socket.emit("mot",solution.key);
 	});
 	syllabe3.addEventListener("click", function() {
 		clearTimeout(time);
@@ -398,6 +429,7 @@ function start() {
 		var mot = document.getElementById("mot");
 		mot.innerHTML = "<p>"+glyphes[2].key+"</p>";
 		solution = glyphes[2];
+		socket.emit("mot",solution.key);
 	});
 }
 
