@@ -164,21 +164,27 @@ io.on('connection', function (socket) {
 				io.sockets.emit("endGame");
 				return;
 			}
-			player = 0;
+			player = 0;console.log("player0");
 		}
 		else {
-			player++;
+			player++;console.log("player++");
 		}
 		io.sockets.emit("player", joueurs[player]);
 	}
+	socket.on("leaveRound", function() {
+		io.sockets.emit("message", { from: null, to: null, text: "Le dessinateur a quitté. Le mot était : "+ mot, date: Date.now() } );
+		for (var i=0; i<joueurs.length; i++) {
+			vies[Object.keys(clients)[i]] = 3;
+		}
+		io.sockets.emit("player", joueurs[player]);
+	});
     
-
 	/** 
 	*  Gestion des déconnexions
 	*/
     
 	// fermeture
-	socket.on("logout", function() {
+	socket.on("logout", function(d) {
 		// si client était identifié (devrait toujours être le cas)
 		if (currentID) {
 			console.log("Sortie de l'utilisateur " + currentID);
@@ -189,6 +195,22 @@ io.on('connection', function (socket) {
 			for (var i=0; i<joueurs.length; i++){
 				if(currentID == joueurs[i]) {
 					joueurs.splice(i, 1);
+					if(d) {
+						if(player == joueurs.length-1) {
+							rounds--;
+							if(rounds == 0){
+							delete clients[currentID];
+							delete scores[currentID];
+							delete vies[currentID];
+							io.sockets.emit("endGame");
+							return;
+							}
+							player = 0;
+						}
+						else {
+							player++;
+						}
+					}
 				}
 			}
 			delete clients[currentID];
@@ -207,9 +229,41 @@ io.on('connection', function (socket) {
 			socket.broadcast.emit("message", 
 		        { from: null, to: null, text: currentID + " vient de se déconnecter de l'application.", date: Date.now() } );
 			// suppression de l'entrée
-			delete clients[currentID];
-			delete scores[currentID];
-			delete vies[currentID];
+			if(joueurs[player] == currentID) {
+				for (var i=0; i<joueurs.length; i++){
+					if(currentID == joueurs[i]) {
+						joueurs.splice(i, 1);
+					}
+				}
+				delete clients[currentID];
+				delete scores[currentID];
+				delete vies[currentID];
+				if(player == joueurs.length-1) {
+				rounds--;
+					if(rounds == 0){
+						io.sockets.emit("endGame");
+						return;
+					}
+					player = 0;
+				}
+				else {
+					player++;
+				}
+				for (var i=0; i<joueurs.length; i++) {
+					vies[Object.keys(clients)[i]] = 3;
+				}console.log("wtf");
+				io.sockets.emit("player", joueurs[player]);
+			}
+			else {
+				for (var i=0; i<joueurs.length; i++){
+					if(currentID == joueurs[i]) {
+						joueurs.splice(i, 1);
+					}
+				}
+				delete clients[currentID];
+				delete scores[currentID];
+				delete vies[currentID];
+			}
 			// envoi de la nouvelle liste pour mise à jour
 			io.sockets.emit("disconnectListe", Object.keys(clients), Object.values(scores));
 		}

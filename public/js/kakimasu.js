@@ -339,10 +339,27 @@ function send() {
 
 function disconnect() {
 	user = null;
-	socket.emit("logout");
-	userLeave = true;
 	if(userPlaying) {
-		socket.emit("endRound");
+		socket.emit("logout", true);
+		userLeave = true;
+		clearTimeout(timeout);
+		document.removeEventListener("mousedown", buttonDown);
+		document.removeEventListener("mouseup", buttonRelease);
+		document.removeEventListener("mouseout", function(e) {
+			var overlay = document.getElementById("overlay");
+			var overlayContext = overlay.getContext("2d");
+			overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+		});
+		var mot = document.getElementById("mot");
+		mot.innerHTML = "<p></p>";
+		solution = null;
+		newKaki();
+		buttonPressed = false;
+		socket.emit("leaveRound");
+	}
+	else {
+		socket.emit("logout", false);
+		userLeave = true;
 	}
 	// Affichage du formulaire pour rejoindre une partie
 	joinGame();
