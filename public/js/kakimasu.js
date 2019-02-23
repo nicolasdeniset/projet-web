@@ -4,11 +4,15 @@ var clients = {}; // Liste des clients
 var scores = {}; // Liste des scores
 var rounds; // Nombre de tours pour chaque partie
 var time; // Temps de chaque tours de dessin
+var vies = 3; // Nombre de message par manche que le joueur à le droit d'envoyer
+var userPlaying = false;
+var userLeave = false;
 
 var objGlyphes = null; // Fichier json contenant les alphabets
 var glyphes = []; // Tableau de 3 glyphes
 var alphabet; // Alphabet qui sera utilisé
 var solution; // Glyphe à trouver
+var timeout; // Décompte avant la fin de la manche
 var buttonPressed = false; // si on clic sur le dessin
 var x = 0; // Position de la souris horizontale
 var y = 0; // Position de la souris verticale
@@ -38,19 +42,18 @@ document.addEventListener("DOMContentLoaded", async function() {
             xhttp.open("GET", "../js/alphabet.json", true);
             xhttp.send();
         }
-	
 	// Fonctions liées a la connexion d'un nouvel utilisateur.
 	// Affichage du formulaire pour rejoindre une partie
 	joinGame();
 	// L'utilisateur souhaite rejoindre une partie
 	document.getElementById("play").addEventListener("click", recuperationInfo, false);
 	// L'utilisateur souhaite créer sa partie
-	document.getElementById("create").addEventListener("click", createGame, false);
+	document.getElementById("create").addEventListener("click", createForm, false);
 	// Création de la partie de l'utilisateur
-	document.getElementById("start").addEventListener("click", recuperationInfo, false);
+	document.getElementById("start").addEventListener("click", createGame, false);
 	// L'utilisateur ne souhaite plus créer de partie. Affichage du premier formulaire
 	document.getElementById("back").addEventListener("click", joinGame, false);
-
+	
 	// Fonctions liées au Chat
 	document.getElementById("btnEnvoyer").addEventListener("click", send, false);
 	document.addEventListener("keypress", function(e) {
@@ -58,76 +61,118 @@ document.addEventListener("DOMContentLoaded", async function() {
 			send();
 		}
 	});
-	socket.on("endGame", function() {
-		var startRound = document.getElementById("startRound");
-		var shadow = document.getElementById("shadow");
-		shadow.style.display = "block";
-		startRound.style.display = "block";
-		startRound.innerHTML = "<p>Fin de la partie ! Le gagnant est :<br>Moi ! haha</p>";
-	});
-	socket.on("player", function(p) {
-		if (user == p) {
-			displayElement("block","none");
-			start();
-			var timeout = setTimeout(function() {
-				socket.emit("endRound");
+
+	// L'utilisateur se déconnecte
+	document.getElementById("deconnexion").addEventListener("click", disconnect, false);
+
+	// Redimension des canvas si la taille de la page est modifié
+	window.addEventListener("resize", resizeCanvas);
+	
+		socket.on("endGame", function() {
+			if(!userLeave) {
+				var startRound = document.getElementById("startRound");
+				var shadow = document.getElementById("shadow");
+				shadow.style.display = "block";
+				startRound.style.display = "block";
+				startRound.innerHTML = "<p>Fin de la partie ! Le gagnant est :<br>Moi ! haha</p>";
+			}
+		});
+		socket.on("stop", function(p) {
+			if(user == p) {console.log("stop"+userLeave);
+				clearTimeout(timeout);
 				document.removeEventListener("mousedown", buttonDown);
-					    document.removeEventListener("mouseup", buttonRelease);
+				document.removeEventListener("mouseup", buttonRelease);
 				document.removeEventListener("mouseout", function(e) {
-						    var overlay = document.getElementById("overlay");
-						    var overlayContext = overlay.getContext("2d");
-						    overlayContext.clearRect(0, 0, overlay.width, overlay.height);
-					    });
+					var overlay = document.getElementById("overlay");
+					var overlayContext = overlay.getContext("2d");
+					overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+				});
 				var mot = document.getElementById("mot");
-					mot.innerHTML = "<p></p>";
+				mot.innerHTML = "<p></p>";
 				solution = null;
 				displayElement("none","block");
 				newKaki();
 				buttonPressed = false;
-			}, time * 1000);
-			document.getElementById("clear").addEventListener("click", newKaki, false);
-			document.getElementById("help").addEventListener("click", helpKaki, false);
-			document.addEventListener("mousedown", buttonDown);
-			document.addEventListener("mouseup", buttonRelease);
-			document.addEventListener("mouseout", function(e) {
-				var overlay = document.getElementById("overlay");
-				var overlayContext = overlay.getContext("2d");
-				overlayContext.clearRect(0, 0, overlay.width, overlay.height);
-			});                      
-			draw();
-		}
-		else {
-			displayElement("none","block");
-			socket.on("trait", function(data) {
-				var dessin = document.getElementById("dessin");
-				var dessinContext = dessin.getContext("2d");
-				for(var i=0; i<data.length; i++) {
-					dessinContext.beginPath();
-					dessinContext.arc(data[i].mouseX, data[i].mouseY, data[i].sizeValue/2, 0, 2 * Math.PI);
-					dessinContext.fill();
-				}
-			});
-			socket.on("gomme", function(data) {
-				var dessin = document.getElementById("dessin");
-				var dessinContext = dessin.getContext("2d");
-				for(var i=0; i<data.length; i++) {
-					dessinContext.beginPath();
-					dessinContext.clearRect(data[i].mouseX, data[i].mouseY, data[i].sizeValue, data[i].sizeValue);
-				}
-			});
-			socket.on("newKaki", function() {
-				var dessin = document.getElementById("dessin");
-				var dessinContext = dessin.getContext("2d");
-				dessinContext.clearRect(0, 0, dessin.width, dessin.height);
-			});
-		}
-	});
+			}
+		});
+		socket.on("disconnectListe", function(c,s) {
+			clients = c;
+			scores = s;
+			getList(clients, scores);
+		});
+		socket.on("player", function(p) {console.log("player "+userLeave);
+			if(!userLeave) {
+			vies = 3;
+			if (user == p) {
+				userPlaying = true;
+				displayElement("block","none");
+				start();
+				timeout = setTimeout(function() {
+					socket.emit("endRound");
+					document.removeEventListener("mousedown", buttonDown);
+						    document.removeEventListener("mouseup", buttonRelease);
+					document.removeEventListener("mouseout", function(e) {
+							    var overlay = document.getElementById("overlay");
+							    var overlayContext = overlay.getContext("2d");
+							    overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+						    });
+					var mot = document.getElementById("mot");
+						mot.innerHTML = "<p></p>";
+					solution = null;
+					displayElement("none","block");
+					newKaki();
+					buttonPressed = false;
+				}, time * 1000);
+				document.getElementById("clear").addEventListener("click", newKaki, false);
+				document.getElementById("help").addEventListener("click", helpKaki, false);
+				document.addEventListener("mousedown", buttonDown);
+				document.addEventListener("mouseup", buttonRelease);
+				document.addEventListener("mouseout", function(e) {
+					var overlay = document.getElementById("overlay");
+					var overlayContext = overlay.getContext("2d");
+					overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+				});                      
+				draw();
+			}
+			else {
+				userPlaying = false;
+				displayElement("none","block");
+				socket.on("trait", function(data) {
+					var dessin = document.getElementById("dessin");
+					var dessinContext = dessin.getContext("2d");
+					for(var i=0; i<data.length; i++) {
+						dessinContext.beginPath();
+						dessinContext.arc(data[i].mouseX, data[i].mouseY, data[i].sizeValue/2, 0, 2 * Math.PI);
+						dessinContext.fill();
+					}
+				});
+				socket.on("gomme", function(data) {
+					var dessin = document.getElementById("dessin");
+					var dessinContext = dessin.getContext("2d");
+					for(var i=0; i<data.length; i++) {
+						dessinContext.beginPath();
+						dessinContext.clearRect(data[i].mouseX, data[i].mouseY, data[i].sizeValue, data[i].sizeValue);
+					}
+				});
+				socket.on("newKaki", function() {
+					var dessin = document.getElementById("dessin");
+					var dessinContext = dessin.getContext("2d");
+					dessinContext.clearRect(0, 0, dessin.width, dessin.height);
+				});
+			}
+			}
+		});
 });
 
 //API Connexion
 // Fonction qui affiche le formulaire pour rejoindre une partie
-function joinGame() {
+function joinGame() {console.log("heho");
 	// Affichage du formulaire pour rejoindre une partie
+	document.getElementById("options").style.display = "block";
+	//document.getElementById("choixAlphabet").style.display = "block";
+	//document.getElementById("play").style.display = "block";
+	//document.getElementById("back").style.display = "block";
+	document.getElementById("deconnexion").style.display = "none";
 	document.getElementById("suffixes").style.display = "none";
 	document.getElementById("prefixes").style.display = "none";
 	document.getElementById("parametres").style.display = "none";
@@ -142,7 +187,7 @@ function joinGame() {
 }
 
 // Fonction qui permet d'afficher le formulaire de création de partie
-function createGame() {
+function createForm() {
 	document.getElementById("suffixes").style.display = "block";
 	document.getElementById("prefixes").style.display = "block";
 	document.getElementById("parametres").style.display = "block";
@@ -150,8 +195,8 @@ function createGame() {
 	document.getElementById("create").style.display = "none";
 }
 
-// Fonction qui permet de récuperer les éléments du formulaire
-function recuperationInfo() {
+// Fonction qui permet de créer une partie
+function createGame() {
 	// Choix du pseudo de l'utilisateur
 	user = document.getElementById("pseudo").value;
 
@@ -163,24 +208,46 @@ function recuperationInfo() {
         }
 
 	// Choix du nombre de tours
-	/*var selectRounds = document.getElementById("rounds");
+	var selectRounds = document.getElementById("rounds");
 	for(var i=0; i<selectRounds.options.length; i++) {
 		if(selectRounds.options[i].selected) {
 			rounds = selectRounds.options[i].value;
 		}
-	}*/
+	}
 
 	// Choix du temps de chaque tours
-	/*var selectTime = document.getElementById("time");
+	var selectTime = document.getElementById("time");
 	for(var i=0; i<selectTime.options.length; i++) {
 		if(selectTime.options[i].selected) {
 			time = selectTime.options[i].value;
 		}
-	}*/
+	}
 
 	// Si l'utilisateur a un pseudo correcte on le connecte au serveur
 	if(user != "") {
+		// Envoi des infos au serveur
+		var tab = []
+		tab[0] = alphabet;
+		tab[1] = rounds;
+		tab[2] = time;
+		socket.emit("create", tab);
+		recuperationInfo();
+	}
+	else {
+		document.getElementById("textPseudo").style.display = "block";
+	}
+}
+
+// Fonction qui permet de récuperer les éléments du formulaire
+function recuperationInfo() {
+	// Choix du pseudo de l'utilisateur
+	user = document.getElementById("pseudo").value;
+
+	// Si l'utilisateur a un pseudo correcte on le connecte au serveur
+	if(user != "") {
+		userLeave = false;
 		// Affichage de la partie
+		document.getElementById("deconnexion").style.display = "block";
 		document.getElementById("mot").style.display = "block";
 		document.getElementById("textPseudo").style.display = "none";
 		document.getElementById("options").style.display = "none";
@@ -194,8 +261,6 @@ function recuperationInfo() {
 		document.getElementById("create").removeEventListener("click", createGame, false);
 		document.getElementById("start").removeEventListener("click", recuperationInfo, false);
 		document.getElementById("back").removeEventListener("click", joinGame, false);
-		// Lancement de la partie
-		socket.emit("go");
 	}
 	else {
 		document.getElementById("textPseudo").style.display = "block";
@@ -233,6 +298,13 @@ function recep() {
 	socket.on("rounds", function(r) {
 		rounds = r;
 	});
+	socket.on("alphabet", function(a) {
+		alphabet = a;
+	});
+	// On redimensionne les canvas
+	resizeCanvas();
+	// Lancement de la partie
+	socket.emit("go");
 }
 
 function getList(clients) {
@@ -240,7 +312,6 @@ function getList(clients) {
 	for (var i=0; i<clients.length; i++) {
 		document.getElementsByTagName("ASIDE")[0].innerHTML += "<div>"+clients[i]+" : "+ scores[i] +" points</div>";
 	}
-
 }
 
 function message(txt) {
@@ -258,16 +329,30 @@ function message(txt) {
 }
 
 function send() {
-	console.log("send");
-	var m = document.getElementById("monMessage").value;
-	socket.emit("message", { from: user, to: null, text: m, date: Date.now() });
-	document.getElementById("monMessage").value = "";	
+	if (vies != 0) {
+        	vies--;
+		var m = document.getElementById("monMessage").value;
+		socket.emit("message", { from: user, to: null, text: m, date: Date.now() });
+		document.getElementById("monMessage").value = "";	
+	}
 }
 
 function disconnect() {
-	document.getElementById("logScreen").style.display = "block";
-	document.getElementById("content").style.display = "none";
 	socket.emit("logout");
+	userLeave = true;
+	if(userPlaying) {
+		socket.emit("endRound");
+	}
+	// Affichage du formulaire pour rejoindre une partie
+	joinGame();
+	// L'utilisateur souhaite rejoindre une partie
+	document.getElementById("play").addEventListener("click", recuperationInfo, false);
+	// L'utilisateur souhaite créer sa partie
+	document.getElementById("create").addEventListener("click", createForm, false);
+	// Création de la partie de l'utilisateur
+	document.getElementById("start").addEventListener("click", createGame, false);
+	// L'utilisateur ne souhaite plus créer de partie. Affichage du premier formulaire
+	document.getElementById("back").addEventListener("click", joinGame, false);
 
 }
 
@@ -292,6 +377,19 @@ function getTool() {
 	gomme = document.getElementById("gomme");
 	if(trait.checked) { radCommande = "trait"; }
 	if(gomme.checked) { radCommande = "gomme"; }
+}
+
+function resizeCanvas() {
+	var content = document.getElementById("content");
+	var dessin = document.getElementById("dessin");
+	var showhelp = document.getElementById("showhelp");
+	var overlay = document.getElementById("overlay");
+	dessin.width = content.clientWidth;
+        dessin.height = content.clientHeight;
+	showhelp.width = content.clientWidth;
+        showhelp.height = content.clientHeight;
+	overlay.width = content.clientWidth;
+        overlay.height = content.clientHeight;
 }
 
 function draw() {
@@ -358,9 +456,10 @@ function clearHelp() {
 }
 
 function helpKaki() {
+	socket.emit("useHelp");
 	var showhelp = document.getElementById("showhelp");
 	var showhelpContext = showhelp.getContext("2d");
-	showhelpContext.font = "320px Comic Sans MS";
+	showhelpContext.font = "15.5vmax Comic Sans MS";
 	showhelpContext.fillStyle = "black";
 	showhelpContext.textAlign = "center";
 	showhelpContext.fillText(String.fromCharCode(solution.ascii), showhelp.width/2, showhelp.height/2);
@@ -437,8 +536,8 @@ function displayElement(x,y) {
 	document.getElementById("size").style.display = x;
 	document.getElementById("clear").style.display = x;
 	document.getElementById("help").style.display = x;
-	document.getElementsByTagName("LABEL")[19].style.display = x;
-	document.getElementsByTagName("LABEL")[20].style.display = x;
+	document.getElementsByTagName("LABEL")[22].style.display = x;
+	document.getElementsByTagName("LABEL")[23].style.display = x;
 	document.getElementById("chat").style.display = y;
 }
 

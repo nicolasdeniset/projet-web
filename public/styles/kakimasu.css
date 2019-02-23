@@ -29,6 +29,7 @@ body {
 	top: 10%;
 	z-index: 2;
 	font-size: 40px;
+	font-size: 2.5vmax;
 	font-weight: bold;
 	font-style: italic;
 }
@@ -46,10 +47,9 @@ body {
 }
 
 #syllabe1 p {
-	position: absolute;
-	left: 40%;
-	top: -30%;
+	text-align: center;
 	font-size: 80px;
+	font-size: 5.5vmax;
 	font-weight: bold;
 	font-style: italic;
 }
@@ -67,10 +67,9 @@ body {
 }
 
 #syllabe2 p {
-	position: absolute;
-	left: 40%;
-	top: -30%;
+	text-align: center;
 	font-size: 80px;
+	font-size: 5.5vmax;
 	font-weight: bold;
 	font-style: italic;
 }
@@ -88,84 +87,98 @@ body {
 }
 
 #syllabe3 p {
-	position: absolute;
-	left: 40%;
-	top: -30%;
+	text-align: center;
 	font-size: 80px;
+	font-size: 5.5vmax;
 	font-weight: bold;
 	font-style: italic;
 }
 
 header {
 	position: absolute;
-	left: 100px;
-	height: 100px;
-	width: 1500px;
+	left: 1%;
+	height: 15%;
+	width: 98%;
 	background-color: red;
 }
 
 aside {
 	position: absolute;
-	top: 100px;
-	left: 100px;
-	height: 700px;
-	width: 300px;
+	top: 15%;
+	left: 1%;
+	height: 70%;
+	width: 19%;
+	font-size: 40px;
 	background-color: green;
+}
+
+aside div {
+	font-size: 20px;
+	font-size: 2.0vmax;
 }
 
 main {
 	position: absolute;
-	top: 100px;
-	left: 400px;
-	height: 700px;
-	width: 800px;
+	top: 15%;
+	left: 20%;
+	height: 70%;
+	width: 50%;
 	background-color: white;
 }
 
 section {
 	position: absolute;
-	top: 100px;
-	left: 1200px;
-	height: 700px;
-	width: 400px;
+	top: 15%;
+	left: 70%;
+	height: 70%;
+	width: 29%;
 	background-color: purple;
+	overflow: scroll;
+}
+
+section div {
+	font-size: 16px;
+	font-size: 1.2vmax;
 }
 
 footer {
 	position: absolute;
-	top: 800px;
-	left: 100px;
-	height: 100px;
-	width: 1500px;
+	top: 85%;
+	left: 1%;
+	height: 15%;
+	width: 98%;
 	background-color: yellow;
 }
 
 #mot {
 	position: absolute;
-	top: 50px;
-	left: 1000px;
-	height: 50px;
-	width: 100px;
+	bottom: -1%;
+	left: 65%;
+	height: 45%;
+	width: 5%;
 	border-radius: 10px;
 	border: solid 3px #000;
 	background-color: white;
 }
 
 #mot p {
-	position: absolute;
-	bottom: -50%;
-	left: 30%;
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 	font-size: 30px;
+	font-size: 2.5vmax;
 	font-weight: bold;
 	font-style: italic;	
 }
 
 #toolbox {
 	position: absolute;
-	top: 650px;
-	height: 50px;
-	width: 800px;
-	background-color: grey;	
+	bottom: 0;
+	height: 10%;
+	width: 100%;
+	background-color: gray;	
 }
 
 #gomme {
@@ -177,34 +190,36 @@ footer {
 }
 
 label {
-	border:1px solid grey;
-	display:inline-block;
+	border:1px solid gray;
+	display: inline-block;
 }
 
 #toolbox label[for=trait] {
 	position: absolute;
-	top: 10px;
-	left: 10px;
-	height: 30px;
-	width: 30px;
+	top: 20%;
+	left: 2%;
+	height: 60%;
+	width: 5%;
 	background-image: url("../images/icone-pinceau.png");
-	background-size: cover;
+	background-size: 100% 100%;
 }
 
 #toolbox label[for=gomme] {
 	position: absolute;
-	top: 10px;
-	left: 50px;
-	height: 30px;
-	width: 30px;
+	top: 20%;
+	left: 10%;
+	height: 60%;
+	width: 5%;
 	background-image: url("../images/icone-gomme.png");
-	background-size: cover;
+	background-size: 100% 100%;
 }
 
 #toolbox input[type=range] {
 	position: absolute;
-	top: 10px;
+	top: 20%;
 	left: 30%;
+	height: 60%;
+	width: 30%;
 }
 
 #toolbox input:checked + label[for] {
@@ -213,43 +228,64 @@ label {
 
 #clear {
 	position: absolute;
-	top: 10px;
-	left: 700px;
-	height: 30px;
-	width: 30px;
+	top: 20%;
+	left: 90%;
+	height: 60%;
+	width: 5%;
 	background-image: url("../images/icone-supprimer.png");
 	background-color: white;
-	background-size: cover;
+	background-size: 100% 100%;
 	border: solid 1px #000;
 }
 
 #help {
 	position: absolute;
-	top: 10px;
-	left: 600px;
-	height: 30px;
-	width: 30px;
+	top: 20%;
+	left: 80%;
+	height: 60%;
+	width: 5%;
 	background-image: url("../images/icone-help.png");
 	background-color: white;
-	background-size: cover;
+	background-size: 100% 100%;
 	border: solid 1px #000;
 }
 
 #chat {
 	position: absolute;
-	top: 750px;
-	left: 1200px;
-	height: 50px;
-	width: 400px;
+	bottom: 15%;
+	left: 70%;
+	height: 7%;
+	width: 29%;
+	z-index: 1;
 	background-color: white;
+}
+
+#chat #monMessage {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 100%;
+	width: 80%;
+	font-size: 16px;
+	font-size: 1.2vmax;
+}
+
+#chat #btnEnvoyer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+	width: 20%;
+	font-size: 16px;
+	font-size: 1.0vmax;
 }
 
 #content {
 	position: absolute;
 	top: 0; 
 	left: 0;
-	width: 800px;
-	height: 650px;
+	width: 100%; 
+	height: 100%;
 	background-color: white;
 }
 
@@ -257,10 +293,10 @@ label {
 	position: absolute;
 	top: 0; 
 	left: 0;
+	width: 100%;
+	height: 100%;
 	cursor: none;
 	border: solid 1px #000;
-	width: 800px;
-	height: 650px;
 }
 #content canvas#overlay {
 	
@@ -272,11 +308,36 @@ label {
 /* Partie Accueil */
 #options {
 	position: absolute;
-	top: 100px;
-	left: 100px;
-	height: 700px;
-	width: 1500px;
+	top: 15%;
+	left: 1%;
+	height: 70%;
+	width: 98%;
 	background-color: beige;
+}
+
+#form {
+	position: absolute;
+	top: 0;
+	left: 40%;
+	height: 100%;
+	width: 100%;
+}
+
+#deconnexion {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 98%;
+	height: 30%;
+	width: 2%;
+	background-image: url("../images/deconnexion.png");
+	background-color: white;
+	background-size: 100% 100%;
+	border: solid 1px #000;
+}
+
+#deconnexion:hover {
+	
 }
 
 #textPseudo {
@@ -287,57 +348,23 @@ label {
 	font-size: 20px;
 	font-weight: bold;
 	font-style: italic;
-	
 }
 
-#pseudo {
-	position: absolute;
-	top: 5%;
-	left: 50%;
+.btn {
+  border-radius: 0;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-#avatar {
-	display: none;
-	position: absolute;
-	left: 50%;
+.btn-inline {
+  margin-top: 0;
 }
 
-#choixAlphabet {
-	position: absolute;
-	top: 10%;
-	left: 50%;
+.btn-retour {
+  color: #333;
 }
 
-#suffixes {
-	display: none;
-	position: absolute;
-	left: 50%;
-	top: 20%;
+.badge-success {
+  background: #22DDAA;
 }
-
-#prefixes {
-	display: none;
-	position: absolute;
-	left: 50%;
-	top: 30%;
-}
-
-#parametres {
-	display: none;
-	position: absolute;
-	left: 50%;
-	top: 55%;
-}
-
-#play {
-	position: absolute;
-	top: 22%;
-	left: 50%;
-}
-
-#create {
-	position: absolute;
-	top: 27%;
-	left: 50%;
-}
-
