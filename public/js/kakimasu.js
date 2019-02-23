@@ -338,6 +338,7 @@ function send() {
 }
 
 function disconnect() {
+	user = null;
 	socket.emit("logout");
 	userLeave = true;
 	if(userPlaying) {
