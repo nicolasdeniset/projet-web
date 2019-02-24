@@ -340,6 +340,223 @@ label {
 	
 }
 
+#pseudo {
+	position: absolute;
+	left: 5%;
+	top: 0;
+	width: 25%;
+}
+
+#avatar {
+	position: absolute;
+	left: 10%;
+	top: 10%;
+	height: 45%;
+	width: 15%;
+}
+
+#flecheD1 {
+	position: absolute;
+	left: 100%;
+	top: 0;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheD2 {
+	position: absolute;
+	left: 100%;
+	top: 20%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheD3 {
+	position: absolute;
+	left: 100%;
+	top: 40%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheD4 {
+	position: absolute;
+	left: 100%;
+	top: 60%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheD5 {
+	position: absolute;
+	left: 100%;
+	top: 80%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheG1 {
+	position: absolute;
+	left: -20%;
+	top: 0;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	transform: rotate(180deg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheG2 {
+	position: absolute;
+	left: -20%;
+	top: 20%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	transform: rotate(180deg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheG3 {
+	position: absolute;
+	left: -20%;
+	top: 40%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	transform: rotate(180deg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheG4 {
+	position: absolute;
+	left: -20%;
+	top: 60%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	transform: rotate(180deg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#flecheG5 {
+	position: absolute;
+	left: -20%;
+	top: 80%;
+	height: 20%;
+	width: 20%;
+	background-image: url("../images/fleche.png");
+	transform: rotate(180deg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#colors {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-image: url("../images/avatar/color/1.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#hairs {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-image: url("../images/avatar/hair/1.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#faces {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-image: url("../images/avatar/faces/1.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#eyes {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-image: url("../images/avatar/eyes/1.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#beard {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-image: url("../images/avatar/beard/1.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+#choixAlphabet {
+	position: absolute;
+	left: 10%;
+	top: 55%;
+}
+
+.col-md-3 {
+	position: absolute;
+	left: 5%;
+	top: 70%;
+}
+
+#suffixes {
+	position: absolute;
+	left: 10%;
+	top: 7%;
+}
+
+#prefixes {
+	position: absolute;
+	left: 10%;
+	top: 20%;
+}
+
+.col-md-12 {
+	position: absolute;
+	left: 0;
+	top: 90%;
+}
+
+
+
 #textPseudo {
 	display: none;
 	position: absolute;

@@ -20,6 +20,11 @@ var size = 30; // Taille des outils de dessin
 var radCommande = "trait"; // Outils actuellement utilisé pour le dessin
 var trait; // Pinceau
 var gomme; // Gomme
+var avatarColor = 1; // Variable pour definir le fond de l'avatar
+var avatarHair = 1; // Variable pour definir les cheveux de l'avatar
+var avatarFace = 1; // Variable pour definir le visage de l'avatar
+var avatarEyes = 1; // Variable pour definir les yeux de l'avatar
+var avatarBeard = 0; // Variable pour definir la barbe de l'avatar
 
 document.addEventListener("DOMContentLoaded", async function() {
 	// Récupération des alphabets
@@ -169,6 +174,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 function joinGame() {console.log("heho");
 	// Affichage du formulaire pour rejoindre une partie
 	document.getElementById("options").style.display = "block";
+	document.getElementById("avatar").style.display = "block";
 	//document.getElementById("choixAlphabet").style.display = "block";
 	//document.getElementById("play").style.display = "block";
 	//document.getElementById("back").style.display = "block";
@@ -184,6 +190,7 @@ function joinGame() {console.log("heho");
 	document.getElementsByTagName("MAIN")[0].style.display = "none";
 	document.getElementsByTagName("SECTION")[0].style.display = "none";
 	document.getElementById("chat").style.display = "none";
+	avatar();
 }
 
 // Fonction qui permet d'afficher le formulaire de création de partie
@@ -191,6 +198,7 @@ function createForm() {
 	document.getElementById("suffixes").style.display = "block";
 	document.getElementById("prefixes").style.display = "block";
 	document.getElementById("parametres").style.display = "block";
+	document.getElementById("avatar").style.display = "none";
 	document.getElementById("play").style.display = "none";
 	document.getElementById("create").style.display = "none";
 }
@@ -557,5 +565,99 @@ function displayElement(x,y) {
 	document.getElementsByTagName("LABEL")[22].style.display = x;
 	document.getElementsByTagName("LABEL")[23].style.display = x;
 	document.getElementById("chat").style.display = y;
+}
+
+function avatar() {console.log("avatar");
+
+	document.getElementById("flecheD1").addEventListener("click", function() {
+		if(avatarColor == 6){
+			avatarColor = 1;
+		}
+		else {
+			avatarColor++;
+		}
+		document.getElementById("colors").style.backgroundImage = "url(\"../images/avatar/color/"+avatarColor+".png\")";
+	}, false);
+	document.getElementById("flecheD2").addEventListener("click", function() {
+		if(avatarHair == 18){
+			avatarHair = 1;
+		}
+		else {
+			avatarHair++;
+		}
+		document.getElementById("hairs").style.backgroundImage = "url(\"../images/avatar/hairs/"+avatarHair+".png\")";
+	}, false);
+	document.getElementById("flecheD3").addEventListener("click", function() {
+		if(avatarFace == 6){
+			avatarFace = 1;
+		}
+		else {
+			avatarFace++;
+		}
+		document.getElementById("faces").style.backgroundImage = "url(\"../images/avatar/faces/"+avatarFace+".png\")";
+	}, false);
+	document.getElementById("flecheD4").addEventListener("click", function() {
+		if(avatarEyes == 6){
+			avatarEyes = 1;
+		}
+		else {
+			avatarEyes++;
+		}
+		document.getElementById("eyes").style.backgroundImage = "url(\"../images/avatar/eyes/"+avatarEyes+".png\")";
+	}, false);
+	document.getElementById("flecheD5").addEventListener("click", function() {
+		if(avatarBeard == 9){
+			avatarBeard = 0;
+		}
+		else {
+			avatarBeard++;
+		}
+		document.getElementById("beard").style.backgroundImage = "url(\"../images/avatar/beard/"+avatarBeard+".png\")";
+	}, false);
+	document.getElementById("flecheG1").addEventListener("click", function() {
+		if(avatarColor == 1){
+			avatarColor = 6;
+		}
+		else {
+			avatarColor--;
+		}
+		document.getElementById("colors").style.backgroundImage = "url(\"../images/avatar/color/"+avatarColor+".png\")";
+	}, false);
+	document.getElementById("flecheG2").addEventListener("click", function() {
+		if(avatarHair == 1){
+			avatarHair = 18;
+		}
+		else {
+			avatarHair--;
+		}
+		document.getElementById("hairs").style.backgroundImage = "url(\"../images/avatar/hairs/"+avatarHair+".png\")";
+	}, false);
+	document.getElementById("flecheG3").addEventListener("click", function() {
+		if(avatarFace == 1){
+			avatarFace = 6;
+		}
+		else {
+			avatarFace--;
+		}
+		document.getElementById("faces").style.backgroundImage = "url(\"../images/avatar/faces/"+avatarFace+".png\")";
+	}, false);
+	document.getElementById("flecheG4").addEventListener("click", function() {
+		if(avatarEyes == 1){
+			avatarEyes = 6;
+		}
+		else {
+			avatarEyes--;
+		}
+		document.getElementById("eyes").style.backgroundImage = "url(\"../images/avatar/eyes/"+avatarEyes+".png\")";
+	}, false);
+	document.getElementById("flecheG5").addEventListener("click", function() {
+		if(avatarBeard == 0){
+			avatarBeard = 9;
+		}
+		else {
+			avatarBeard--;
+		}
+		document.getElementById("beard").style.backgroundImage = "url(\"../images/avatar/beard/"+avatarBeard+".png\")";
+	}, false);
 }
 

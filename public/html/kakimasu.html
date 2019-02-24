@@ -36,7 +36,23 @@
 	<form id="options">
 	<div id="form">
 	<input id="pseudo" type="text" placeholder="Entrez votre nom" maxlength="16">
-	<div id="avatar"></div>
+	<div id="avatar">
+		<div id="colors"></div>
+		<div id="faces"></div>
+		<div id="hairs"></div>
+		<div id="eyes"></div>
+		<div id="beard"></div>
+		<div id="flecheD1"></div>
+		<div id="flecheD2"></div>
+		<div id="flecheD3"></div>
+		<div id="flecheD4"></div>
+		<div id="flecheD5"></div>
+		<div id="flecheG1"></div>
+		<div id="flecheG2"></div>
+		<div id="flecheG3"></div>
+		<div id="flecheG4"></div>
+		<div id="flecheG5"></div>
+	</div>
 	<div class="form-group" id="choixAlphabet">
 		<label class="control-label required">Choisissez l'alphabet :</label><br>
 		<label class="radio-inline"><input type="radio" name="radGlyphe" value="hiragana" checked> hiragana</label>
@@ -92,11 +108,12 @@
 			<option>120</option>
 		</select>
 		<br>
+		<div class="col-md-12">
 		<input class="btn btn-inline btn-success btn-block" id="start" type="button" value="Commencez !">
-		<br>
 		<input class="btn btn-inline btn-success btn-block" id="back" type="button" value="Rejoindre une partie">
+		</div>
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-3">
 	<input class="btn btn-inline btn-success btn-block" id="play" type="button" value="Jouez !">
 	<input class="btn btn-inline btn-success btn-block" id="create"  type="button" value="Créez votre salon !">
 	</div>

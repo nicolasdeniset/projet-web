@@ -61,7 +61,7 @@ function joinGame() {
 	document.getElementById("parametres").style.display = "none";
 	document.getElementById("textPseudo").style.display = "none";
 	document.getElementById("play").style.display = "block";
-	document.getElementById("create").style.display = "block";
+	document.getElementById("create").style.display = "block"; avatar();
 }
 
 // Fonction qui permet d'afficher le formulaire de création de partie
@@ -71,4 +71,23 @@ function createGame() {
 	document.getElementById("parametres").style.display = "block";
 	document.getElementById("play").style.display = "none";
 	document.getElementById("create").style.display = "none";
+}
+
+function resizeAvatar(x) {
+	var avatar = document.getElementById("avatar");
+	document.getElementById(x).width = avatar.clientWidt/10;
+        document.getElementById(x).height = avatar.clientHeight/10;
+}
+
+function avatar() {console.log("avatar");
+	document.getElementById("colors").style.backgroundImage = "url(\"../images/avatar/color/1.png\")";
+	resizeAvatar("colors");
+	document.getElementById("hairs").style.backgroundImage = "url(\"../images/avatar/hairs/6.png\")";
+	resizeAvatar("hairs");
+	document.getElementById("faces").style.backgroundImage = "url(\"../images/avatar/faces/1.png\")";
+	resizeAvatar("faces");
+	document.getElementById("eyes").style.backgroundImage = "url(\"../images/avatar/eyes/1.png\")";
+	resizeAvatar("eyes");
+	document.getElementById("beard").style.backgroundImage = "url(\"../images/avatar/beard/1.png\")";
+	resizeAvatar("beard");
 }
