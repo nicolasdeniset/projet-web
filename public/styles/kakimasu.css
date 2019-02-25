@@ -10,8 +10,8 @@ body {
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 1600px;
-	height: 900px;
+	width: 100%;
+	height: 100%;
 	z-index: 1;
 	background-color: gray;
 	opacity: 0.6;
@@ -130,13 +130,13 @@ section {
 	position: absolute;
 	top: 15%;
 	left: 70%;
-	height: 70%;
+	height: 63%;
 	width: 29%;
 	background-color: purple;
 	overflow: scroll;
 }
 
-section div {
+section #chat {
 	font-size: 16px;
 	font-size: 1.2vmax;
 }
@@ -257,7 +257,7 @@ label {
 	height: 7%;
 	width: 29%;
 	z-index: 1;
-	background-color: white;
+	background-color: purple;
 }
 
 #chat #monMessage {
@@ -265,19 +265,9 @@ label {
 	bottom: 0;
 	left: 0;
 	height: 100%;
-	width: 80%;
+	width: 100%;
 	font-size: 16px;
 	font-size: 1.2vmax;
-}
-
-#chat #btnEnvoyer {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	height: 100%;
-	width: 20%;
-	font-size: 16px;
-	font-size: 1.0vmax;
 }
 
 #content {
@@ -333,6 +323,18 @@ label {
 	background-image: url("../images/deconnexion.png");
 	background-color: white;
 	background-size: 100% 100%;
+	border: solid 1px #000;
+}
+
+#avatarCanvas {
+	display: none;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	top: 0; 
+	left: 0;
+	z-index: 1;
+	cursor: none;
 	border: solid 1px #000;
 }
 

@@ -20,6 +20,7 @@ var size = 30; // Taille des outils de dessin
 var radCommande = "trait"; // Outils actuellement utilisé pour le dessin
 var trait; // Pinceau
 var gomme; // Gomme
+var imgAvatar; // Image correspondant a l'avatar
 var avatarColor = 1; // Variable pour definir le fond de l'avatar
 var avatarHair = 1; // Variable pour definir les cheveux de l'avatar
 var avatarFace = 1; // Variable pour definir le visage de l'avatar
@@ -60,7 +61,6 @@ document.addEventListener("DOMContentLoaded", async function() {
 	document.getElementById("back").addEventListener("click", joinGame, false);
 	
 	// Fonctions liées au Chat
-	document.getElementById("btnEnvoyer").addEventListener("click", send, false);
 	document.addEventListener("keypress", function(e) {
 		if(e.key === 'Enter') {
 			send();
@@ -252,7 +252,7 @@ function recuperationInfo() {
 	user = document.getElementById("pseudo").value;
 
 	// Si l'utilisateur a un pseudo correcte on le connecte au serveur
-	if(user != "") {
+	if(user != "") {createMyAvatar();
 		userLeave = false;
 		// Affichage de la partie
 		document.getElementById("deconnexion").style.display = "block";
@@ -262,6 +262,7 @@ function recuperationInfo() {
 		document.getElementsByTagName("ASIDE")[0].style.display = "block";
 		document.getElementsByTagName("MAIN")[0].style.display = "block";
 		document.getElementsByTagName("SECTION")[0].style.display = "block";
+		document.getElementById("chat").style.display = "block";
 		// Connexion au serveur
 		connect();
 		// Suppression des événements du formulaire
@@ -316,10 +317,11 @@ function recep() {
 }
 
 function getList(clients) {
+	setTimeout(function() {
 	document.getElementsByTagName("ASIDE")[0].innerHTML = "";
-	for (var i=0; i<clients.length; i++) {
-		document.getElementsByTagName("ASIDE")[0].innerHTML += "<div>"+clients[i]+" : "+ scores[i] +" points</div>";
-	}
+	for (var i=0; i<clients.length; i++) {console.log("wait");
+		document.getElementsByTagName("ASIDE")[0].innerHTML += "<div><img src=\"./"+imgAvatar.src+"\"> "+clients[i]+" : "+ scores[i] +" points</div>";
+	}}, 1000);console.log(document.getElementsByTagName("ASIDE")[0].clientWidth);console.log(document.getElementsByTagName("ASIDE")[0].clientHeight);
 }
 
 function message(txt) {
@@ -564,10 +566,10 @@ function displayElement(x,y) {
 	document.getElementById("help").style.display = x;
 	document.getElementsByTagName("LABEL")[22].style.display = x;
 	document.getElementsByTagName("LABEL")[23].style.display = x;
-	document.getElementById("chat").style.display = y;
+	document.getElementById("monMessage").style.display = y;
 }
 
-function avatar() {console.log("avatar");
+function avatar() {
 
 	document.getElementById("flecheD1").addEventListener("click", function() {
 		if(avatarColor == 6){
@@ -659,5 +661,69 @@ function avatar() {console.log("avatar");
 		}
 		document.getElementById("beard").style.backgroundImage = "url(\"../images/avatar/beard/"+avatarBeard+".png\")";
 	}, false);
+	
+}
+
+// Fonction qui sert a créer l'avatar une fois les élements choisi
+function createMyAvatar() {
+	var myAvatar = document.getElementById("avatarCanvas");
+	var myAvatarContext = myAvatar.getContext("2d");
+
+	// Définition de la taille de l'image.
+	var colors = document.getElementById("colors");
+	//myAvatar.width = colors.clientWidth;
+        //myAvatar.height = colors.clientHeight;
+	myAvatarContext.clearRect(0, 0, myAvatarContext.width, myAvatarContext.height);
+
+	// Creation de l'image sur le canvas
+	var imgColors = new Image();
+	imgColors.src = "../images/avatar/color/"+avatarColor+".png";
+        imgColors.onload = function() {
+		myAvatarContext.drawImage(imgColors, 0, 0, myAvatar.width, myAvatar.height);
+	}
+
+	setTimeout(function() {
+		var imgFace = new Image();
+		imgFace.src = "../images/avatar/faces/"+avatarFace+".png";
+		imgFace.onload = function() {
+			myAvatarContext.drawImage(imgFace, 0, 0, myAvatar.width, myAvatar.height);
+		}
+	}, 100);
+
+	setTimeout(function() {
+		var imgHairs = new Image();
+		imgHairs.src = "../images/avatar/hairs/"+avatarHair+".png";
+		imgHairs.onload = function() {
+			myAvatarContext.drawImage(imgHairs, 0, 0, myAvatar.width, myAvatar.height);
+		}
+	}, 200);
+	
+	setTimeout(function() {
+		var imgEyes = new Image();
+		imgEyes.src = "../images/avatar/eyes/"+avatarEyes+".png";
+		imgEyes.onload = function() {
+			myAvatarContext.drawImage(imgEyes, 0, 0, myAvatar.width, myAvatar.height);
+		}
+	}, 300);
+
+	setTimeout(function() {
+		var imgBeard = new Image();
+		imgBeard.src = "../images/avatar/beard/"+avatarBeard+".png";
+		imgBeard.onload = function() {
+			myAvatarContext.drawImage(imgBeard, 0, 0, myAvatar.width, myAvatar.height);
+		}
+	}, 400);
+	setTimeout(function() {
+		imgAvatar = new Image();
+		imgAvatar.src = myAvatar.toDataURL();
+		//imgAvatar.style.width = "20%";
+		//imgAvatar.style.height = "20%";
+		var footercanvas = document.getElementById("footercanvas");
+		var footercanvasContext = footercanvas.getContext("2d");
+		imgAvatar.onload = function() {
+			footercanvasContext.drawImage(imgAvatar, 0, 0, footercanvas.width, footercanvas.height);
+		}
+	console.log(imgAvatar);}, 600);
+	
 }
 

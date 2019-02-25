@@ -37,6 +37,7 @@
 	<div id="form">
 	<input id="pseudo" type="text" placeholder="Entrez votre nom" maxlength="16">
 	<div id="avatar">
+		<canvas id="avatarCanvas"></canvas>
 		<div id="colors"></div>
 		<div id="faces"></div>
 		<div id="hairs"></div>
@@ -143,9 +144,8 @@
 	</section>
 	<div id="chat">
 		<input type="text" id="monMessage">
-		<input type="button" value="Envoyer" id="btnEnvoyer">
 	</div>
-	<footer>
+	<footer><canvas id="footercanvas" style="width: 5%; height: 100%;"></canvas>
 	</footer>
 </body>
 </html>
