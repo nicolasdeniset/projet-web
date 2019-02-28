@@ -26,6 +26,7 @@ var avatarHair = 1; // Variable pour definir les cheveux de l'avatar
 var avatarFace = 1; // Variable pour definir le visage de l'avatar
 var avatarEyes = 1; // Variable pour definir les yeux de l'avatar
 var avatarBeard = 0; // Variable pour definir la barbe de l'avatar
+var numGame = 0;
 
 document.addEventListener("DOMContentLoaded", async function() {
 	// Récupération des alphabets
