@@ -26,6 +26,8 @@
 	<header>
 		<div id="mot">
 		</div>
+		<div id="numGame"></div>
+		<input class="btn btn-inline btn-success btn-block" id="gogo" type="button" value="Let's Go !">
 		<div id="textPseudo">
 			Vous devez entrer votre pseudo avant de rejoindre une partie !
 		</div>
@@ -36,6 +38,9 @@
 	<form id="options">
 	<div id="form">
 	<input id="pseudo" type="text" placeholder="Entrez votre nom" maxlength="16">
+	<div id="divJoin">
+		<input id="idJoin" type="text" placeholder="Numéro de Partie" maxlength="2">
+	</div>
 	<div id="avatar">
 		<canvas id="avatarCanvas"></canvas>
 		<div id="colors"></div>
@@ -111,12 +116,15 @@
 		<br>
 		<div class="col-md-12">
 		<input class="btn btn-inline btn-success btn-block" id="start" type="button" value="Commencez !">
-		<input class="btn btn-inline btn-success btn-block" id="back" type="button" value="Rejoindre une partie">
+		<input class="btn btn-inline btn-success btn-block" id="back" type="button" value="Retour">
 		</div>
 	</div>
 	<div class="col-md-3">
 	<input class="btn btn-inline btn-success btn-block" id="play" type="button" value="Jouez !">
 	<input class="btn btn-inline btn-success btn-block" id="create"  type="button" value="Créez votre salon !">
+	<input class="btn btn-inline btn-success btn-block" id="join"  type="button" value="Rejoignez vos Amis !">
+	<input class="btn btn-inline btn-success btn-block" id="joinF" type="button" value="Rejoindre cette partie">
+	<input class="btn btn-inline btn-success btn-block" id="backF" type="button" value="Retour">
 	</div>
 	</div>
 	</form>

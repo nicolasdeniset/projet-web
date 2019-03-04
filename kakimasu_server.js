@@ -8,10 +8,6 @@ var server = app.listen(8080, function() {
 // Ecoute sur les websockets
 var io = require('socket.io').listen(server);
 
-// Tableau de tout les traits.
-var arc_history = [];
-var clear_history = [];
-
 // Configuration d'express pour utiliser le répertoire "public"
 app.use(express.static('public'));
 // set up to 
@@ -19,164 +15,191 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/public/html/kakimasu.html');
 });
 
-/*** Gestion des clients et des connexions ***/
+/*** Gestion des parties ***/
 
-var clients = {};       // id -> socket
-var scores = {};	// Liste des scores
-var joueurs = [];	// Tableau de joueurs
-var vies = {};      // Tableau de vies
-var nbtrouve = 0;
-var useHelp = false; // Booleen qui permet de savoir si l'utilisateur utilise l'aide
-var mot;	// Syllabe a trouver
-var player = 0; // Compteur pour savoir qui doit dessiner
-var rounds = 3; // Compteur du nombres de tours
-var time = 30; // Durée de chaques manches (en secondes)
-var alphabet = (Math.random() < 0.5) ? 'hiragana' : 'katakana'; // Alphabet qui sera utilisé
+var partie = {
+	clients: {},	// id -> socket
+	scores: {},		// Liste des scores
+	joueurs: [],	// Tableau de joueurs
+	vies: {},		// Tableau de vies
+	nbtrouve: 0,
+	oneLifeLeft: 0,		// Variable pour savoir si tous les joueurs n'ont plus qu'un seul essaie	
+	useHelp: false, // Booleen qui permet de savoir si l'utilisateur utilise l'aide
+	mot: "",		// Syllabe a trouver
+	player: 0,		// Compteur pour savoir qui doit dessiner
+	rounds: 5,		// Compteur du nombres de tours
+	time: 30,		// Durée de chaques manches (en secondes)
+	fini: true,
+	alphabet: (Math.random() < 0.5) ? "hiragana" : "katakana", // Alphabet qui sera utilisé
+	arc_history: [],	// Tableau de tout les traits.
+	clear_history: [] 
+};
+
+var serveur = [];
 
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
     // message de debug
     console.log("Un client s'est connecté");
     var currentID = null;
-    
-    /**
-     *  Doit être la première action après la connexion.
-     *  @param  id  string  l'identifiant saisi par le client
-     */
-    socket.on("login", function(id) {
-        while (clients[id]) {
+
+	socket.on("create", function(tab) {
+		var i = serveur.length;
+		if (i == 0) {
+			serveur[0] = Object.create(partie);
+			i++;
+		}
+		serveur[i] = Object.create(partie);
+        serveur[i].rounds = tab[1];
+		serveur[i].time = tab[2];
+		serveur[i].alphabet = tab[0];
+		serveur[i].joueurs = [];
+		socket.emit("num", i);
+	});
+	socket.on("randomGame", function() {
+		if (serveur.length == 0) {
+			serveur[0] = Object.create(partie);
+		}
+		socket.emit("num", 0);
+	});		
+
+    socket.on("login", function(id, num) {
+		console.log(id+" "+num);
+        while (serveur[num].clients[id]) {
             id = id + "(1)";   
         }
         currentID = id;
-        clients[currentID] = socket;
-	scores[currentID] = 0;
-	vies[currentID] = 3;
-        joueurs.push(currentID);
+        serveur[num].clients[currentID] = socket;
+		serveur[num].scores[currentID] = 0;
+		serveur[num].vies[currentID] = 3;
+        serveur[num].joueurs.push(currentID);
         
-        console.log("Nouvel utilisateur : " + currentID);
+        console.log("Nouvel utilisateur : " + currentID + " (Partie : " + num + ")");
         // envoi d'un message de bienvenue à ce client
         socket.emit("bienvenue", id);
         // envoi aux autres clients 
-        socket.broadcast.emit("message", { from: null, to: null, text: currentID + " a rejoint la partie !", date: Date.now() } );
+        socket.broadcast.emit("message", { from: null, to: null, text: currentID + " a rejoint la partie !", date: Date.now() }, num );
         // envoi de la nouvelle liste à tous les clients connectés 
-        io.sockets.emit("liste", Object.keys(clients));
-	// envoi des scores à tous les clients
-	io.sockets.emit("score", Object.values(scores));
-	// envoi du nombres de tours
-	io.sockets.emit("rounds", rounds);
-	// envoi du temps de chaques manches
-	io.sockets.emit("temps", time);
-	// envoi de l'alphabet utilisé
-	io.sockets.emit("alphabet", alphabet);
-    });
+        io.sockets.emit("liste", serveur[num].joueurs, num);
+		// envoi des scores à tous les clients
+		io.sockets.emit("score", Object.values(serveur[num].scores), num);
+		// envoi du nombres de tours
+		io.sockets.emit("rounds", serveur[num].rounds, num);
+		// envoi du temps de chaques manches
+		io.sockets.emit("temps", serveur[num].time, num);
+		// envoi de l'alphabet utilisé
+		io.sockets.emit("alphabet", serveur[num].alphabet, num);
+		});
     
     
 	/**
 	*  Réception d'un message et transmission à tous.
 	*  @param  msg     Object  le message à transférer à tous  
 	*/
-	socket.on("message", function(msg) {
-		console.log("Reçu message");   
+	socket.on("message", function(msg, num) {
+		console.log("Reçu message (Partie : " + num + ")");   
 		// si jamais la date n'existe pas, on la rajoute
 		msg.date = Date.now();
-		if ((msg.text > mot) || (msg.text < mot)) {
-			vies[msg.from]--;
-			io.sockets.emit("message", msg);
-			console.log(msg.from+" "+vies[msg.from]);
+		if ((msg.text > serveur[num].mot) || (msg.text < serveur[num].mot)) {
+			serveur[num].vies[msg.from]--;
+			io.sockets.emit("message", msg, num);
+			if(serveur[num].vies[msg.from] == 1) {
+				serveur[num].oneLifeLeft++;
+			}
 		}
 		else {
-			console.log(msg.from+" "+vies[msg.from]);
 			msg.text = msg.from+" à trouvé !";
-			scores[msg.from] += joueurs.length*100 - nbtrouve*100;
-			if(useHelp) {
-				scores[joueurs[player]] += (vies[msg.from]*75)/2;
+			io.sockets.emit("playingGoodSound", msg.from, num);
+			serveur[num].scores[msg.from] += serveur[num].joueurs.length*100 - serveur[num].nbtrouve*100;
+			if(serveur[num].useHelp) {
+				serveur[num].scores[serveur[num].joueurs[serveur[num].player]] += (serveur[num].vies[msg.from]*75)/2;
 			}
 			else {
-				scores[joueurs[player]] += vies[msg.from]*75;
+				serveur[num].scores[serveur[num].joueurs[serveur[num].player]] += serveur[num].vies[msg.from]*75;
 			}
-            		nbtrouve++;
+           		serveur[num].nbtrouve++;
 			msg.to = msg.from;
 			msg.from = "juste";
-			io.sockets.emit("message", msg);
-			io.sockets.emit("score", Object.values(scores));
-			if(nbtrouve == joueurs.length-1) {
-				nbtrouve = 0;
-				endRound();
+			io.sockets.emit("message", msg, num);
+			io.sockets.emit("score", Object.values(serveur[num].scores), num);
+			if(serveur[num].nbtrouve == serveur[num].joueurs.length-1) {
+				serveur[num].nbtrouve = 0;
+				endRound(num);
 			}
 		}
-		var fini = true;
-		for (var i=0; i<joueurs.length; i++) {
-			if (vies[Object.keys(clients)[i]] != 0) {
-				if (i != player) {
-					fini = false;
+		if(serveur[num].oneLifeLeft == serveur[num].joueurs.length-1) {
+			io.sockets.emit("playingBadSound", parseInt(Math.random()*7)+1, num);
+			serveur[num].oneLifeLeft = 0;
+		}
+		for (var i=0; i<serveur[num].joueurs.length; i++) {
+			if (serveur[num].vies[Object.keys(serveur[num].clients)[i]] != 0) {
+				if (i != serveur[num].player) {
+					serveur[num].fini = false;
 				}
 			}
 		}
-		console.log(fini);
-		if (fini) {
-			endRound();
+		if (serveur[num].fini) {
+			endRound(num);
 		}
 	});
 
     /** 
      *  Gestion du Jeu
      */
-	socket.on("create", function(tab) {
-        	rounds = tab[1];
-		time = tab[2];
-		alphabet = tab[0];
+	socket.on("go", function(num) {
+        socket.emit("player", serveur[num].joueurs[0], num);		
 	});
-	socket.on("go", function() {
-        socket.emit("player", joueurs[0]);		
+	socket.on("mot", function(m, num) {
+		serveur[num].mot = m;
 	});
-	socket.on("mot", function(m) {
-		mot = m;
+	socket.on("draw", function(data, num) {
+		serveur[num].clear_history = [];
+		serveur[num].arc_history.push(data);
+		socket.broadcast.emit("trait", serveur[num].arc_history, num);
 	});
-	socket.on("draw", function(data) {
-		clear_history = [];
-		arc_history.push(data);
-		socket.broadcast.emit("trait", arc_history);
+	socket.on("drawClear", function(data, num) {
+		serveur[num].arc_history = [];
+		serveur[num].clear_history.push(data);
+		socket.broadcast.emit("gomme", serveur[num].clear_history, num);
 	});
-	socket.on("drawClear", function(data) {
-		arc_history = [];
-		clear_history.push(data);
-		socket.broadcast.emit("gomme", clear_history);
+	socket.on("newKaki", function(num) {
+		serveur[num].arc_history = [];
+		serveur[num].clear_history = [];
+		socket.broadcast.emit("newKaki", num);
 	});
-	socket.on("newKaki", function() {
-		arc_history = [];
-		clear_history = [];
-		socket.broadcast.emit("newKaki");
+	socket.on("useHelp", function(num) {
+		serveur[num].useHelp = true;
 	});
-	socket.on("useHelp", function() {
-		useHelp = true;
+	socket.on("endRound", function(num) {
+		endRound(num);
 	});
-	socket.on("endRound", endRound);
-	function endRound() {
-		useHelp = false;
-		io.sockets.emit("stop", joueurs[player]);
-		io.sockets.emit("message", { from: null, to: null, text: "Fin de la manche. Le mot était : "+ mot, date: Date.now() } );
-		for (var i=0; i<joueurs.length; i++) {
-			vies[Object.keys(clients)[i]] = 3;
+
+	function endRound(num) {
+		serveur[num].useHelp = false;
+		io.sockets.emit("stop", serveur[num].joueurs[serveur[num].player], num);
+		io.sockets.emit("message", { from: null, to: null, text: "Fin de la manche. Le mot était : "+ serveur[num].mot, date: Date.now() }, num );
+		for (var i=0; i<serveur[num].joueurs.length; i++) {
+			serveur[num].vies[Object.keys(serveur[num].clients)[i]] = 3;
 		}
-		if(player == joueurs.length-1) {
-			rounds--;
-			if(rounds == 0){
-				io.sockets.emit("endGame");
+		if(serveur[num].player == serveur[num].joueurs.length-1) {
+			serveur[num].rounds--;
+			if(serveur[num].rounds == 0){
+				io.sockets.emit("endGame", num);
 				return;
 			}
-			player = 0;console.log("player0");
+			serveur[num].player = 0;
 		}
 		else {
-			player++;console.log("player++");
+			serveur[num].player++;
 		}
-		io.sockets.emit("player", joueurs[player]);
+		io.sockets.emit("player", serveur[num].joueurs[serveur[num].player], num);
 	}
-	socket.on("leaveRound", function() {
-		io.sockets.emit("message", { from: null, to: null, text: "Le dessinateur a quitté. Le mot était : "+ mot, date: Date.now() } );
-		for (var i=0; i<joueurs.length; i++) {
-			vies[Object.keys(clients)[i]] = 3;
+	socket.on("leaveRound", function(num) {
+		io.sockets.emit("message", { from: null, to: null, text: "Le dessinateur a quitté. Le mot était : "+ mot, date: Date.now() }, num );
+		for (var i=0; i<serveur[num].joueurs.length; i++) {
+			serveur[num].vies[Object.keys(serveur[num].clients)[i]] = 3;
 		}
-		io.sockets.emit("player", joueurs[player]);
+		io.sockets.emit("player", serveur[num].joueurs[serveur[num].player], num);
 	});
     
 	/** 
@@ -184,40 +207,40 @@ io.on('connection', function (socket) {
 	*/
     
 	// fermeture
-	socket.on("logout", function(d) {
+	socket.on("logout", function(d, num) {
 		// si client était identifié (devrait toujours être le cas)
 		if (currentID) {
 			console.log("Sortie de l'utilisateur " + currentID);
 			// envoi de l'information de déconnexion
 			socket.broadcast.emit("message", 
-			{ from: null, to: null, text: currentID + " a quitté la partie.", date: Date.now() } );
+			{ from: null, to: null, text: currentID + " a quitté la partie.", date: Date.now() }, num );
 			// suppression de l'entrée
-			for (var i=0; i<joueurs.length; i++){
-				if(currentID == joueurs[i]) {
-					joueurs.splice(i, 1);
+			for (var i=0; i<serveur[num].joueurs.length; i++){
+				if(currentID == serveur[num].joueurs[i]) {
+					serveur[num].joueurs.splice(i, 1);
 					if(d) {
-						if(player == joueurs.length-1) {
-							rounds--;
-							if(rounds == 0){
-							delete clients[currentID];
-							delete scores[currentID];
-							delete vies[currentID];
-							io.sockets.emit("endGame");
-							return;
+						if(serveur[num].player == serveur[num].joueurs.length-1) {
+							serveur[num].rounds--;
+							if(serveur[num].rounds == 0){
+								delete serveur[num].clients[currentID];
+								delete serveur[num].scores[currentID];
+								delete serveur[num].vies[currentID];
+								io.sockets.emit("endGame", num);
+								return;
 							}
-							player = 0;
+							serveur[num].player = 0;
 						}
 						else {
-							player++;
+							serveur[num].player++;
 						}
 					}
 				}
 			}
-			delete clients[currentID];
-			delete scores[currentID];
-			delete vies[currentID];
+			delete serveur[num].clients[currentID];
+			delete serveur[num].scores[currentID];
+			delete serveur[num].vies[currentID];
 			// envoi de la nouvelle liste pour mise à jour
-			io.sockets.emit("disconnectListe", Object.keys(clients), Object.values(scores));
+			io.sockets.emit("disconnectListe", serveur[num].joueurs, Object.values(serveur[num].scores), num);
 		}
 	});
     
@@ -225,47 +248,54 @@ io.on('connection', function (socket) {
 	socket.on("disconnect", function(reason) { 
 		// si client était identifié
 		if (currentID) {
+			for (var i=0; i<serveur.length; i++) {
+				for (var j=0; j<serveur[i].joueurs.length; j++) {
+					if (currentID == serveur[i].joueurs[j]) {
+						var num = i;
+					}
+				}
+			}
 			// envoi de l'information de déconnexion
 			socket.broadcast.emit("message", 
-		        { from: null, to: null, text: currentID + " vient de se déconnecter de l'application.", date: Date.now() } );
+		        { from: null, to: null, text: currentID + " vient de se déconnecter de l'application.", date: Date.now() }, num );
 			// suppression de l'entrée
-			if(joueurs[player] == currentID) {
-				for (var i=0; i<joueurs.length; i++){
-					if(currentID == joueurs[i]) {
-						joueurs.splice(i, 1);
+			if(serveur[num].joueurs[serveur[num].player] == currentID) {
+				for (var i=0; i<serveur[num].joueurs.length; i++){
+					if(currentID == serveur[num].joueurs[i]) {
+						serveur[num].joueurs.splice(i, 1);
 					}
 				}
-				delete clients[currentID];
-				delete scores[currentID];
-				delete vies[currentID];
-				if(player == joueurs.length-1) {
-				rounds--;
-					if(rounds == 0){
-						io.sockets.emit("endGame");
+				delete serveur[num].clients[currentID];
+				delete serveur[num].scores[currentID];
+				delete serveur[num].vies[currentID];
+				if(serveur[num].player == serveur[num].joueurs.length-1) {
+				serveur[num].rounds--;
+					if(serveur[num].rounds == 0){
+						io.sockets.emit("endGame", num);
 						return;
 					}
-					player = 0;
+					serveur[num].player = 0;
 				}
 				else {
-					player++;
+					serveur[num].player++;
 				}
-				for (var i=0; i<joueurs.length; i++) {
-					vies[Object.keys(clients)[i]] = 3;
-				}console.log("wtf");
-				io.sockets.emit("player", joueurs[player]);
+				for (var i=0; i<serveur[num].joueurs.length; i++) {
+					serveur[num].vies[Object.keys(serveur[num].clients)[i]] = 3;
+				}
+				io.sockets.emit("player", serveur[num].joueurs[serveur[num].player], num);
 			}
 			else {
-				for (var i=0; i<joueurs.length; i++){
-					if(currentID == joueurs[i]) {
-						joueurs.splice(i, 1);
+				for (var i=0; i<serveur[num].joueurs.length; i++){
+					if(currentID == serveur[num].joueurs[i]) {
+						serveur[num].joueurs.splice(i, 1);
 					}
 				}
-				delete clients[currentID];
-				delete scores[currentID];
-				delete vies[currentID];
+				delete serveur[num].clients[currentID];
+				delete serveur[num].scores[currentID];
+				delete serveur[num].vies[currentID];
 			}
 			// envoi de la nouvelle liste pour mise à jour
-			io.sockets.emit("disconnectListe", Object.keys(clients), Object.values(scores));
+			io.sockets.emit("disconnectListe", serveur[num].joueurs, Object.values(serveur[num].scores), num);
 		}
 		console.log("Client déconnecté");
 		});
