@@ -27,7 +27,7 @@ var partie = {
 	useHelp: false, // Booleen qui permet de savoir si l'utilisateur utilise l'aide
 	mot: "",		// Syllabe a trouver
 	player: 0,		// Compteur pour savoir qui doit dessiner
-	rounds: 5,		// Compteur du nombres de tours
+	rounds: 2,		// Compteur du nombres de tours
 	time: 30,		// Durée de chaques manches (en secondes)
 	fini: true,
 	alphabet: (Math.random() < 0.5) ? "hiragana" : "katakana", // Alphabet qui sera utilisé
@@ -106,6 +106,36 @@ io.on('connection', function (socket) {
 			if(serveur[num].vies[msg.from] == 1) {
 				serveur[num].oneLifeLeft++;
 			}
+			if(msg.text.length == serveur[num].mot.length) { // Système d'aide pour trouver le mot
+				if(serveur[num].mot.length == 1) { // Mot avec 1 lettre
+					var helpmsg = { from: null, to: msg.from, text: "Vous êtes proche de la solution !", date: Date.now() };
+					io.sockets.emit("message", helpmsg, num);
+				}
+				else {
+					if(serveur[num].mot.length == 2) { // Mot avec 2 lettres
+						if((serveur[num].mot.charAt(0) == msg.text.charAt(0))||(serveur[num].mot.charAt(1) == msg.text.charAt(1))) { // L'utilisateur est proche de la solution s'il possède 1 lettre juste
+							var helpmsg = { from: null, to: msg.from, text: "Vous êtes proche de la solution !", date: Date.now() };
+							io.sockets.emit("message", helpmsg, num);
+						}
+					}
+					else { // Mot avec 3 lettres
+						var cpt = 0; // Compteur pour savoir combien de lettre sont correcte
+						if(serveur[num].mot.charAt(0) == msg.text.charAt(0)) {
+							cpt++;
+						}
+						if(serveur[num].mot.charAt(1) == msg.text.charAt(1)) {
+							cpt++;
+						}
+						if(serveur[num].mot.charAt(2) == msg.text.charAt(2)) {
+							cpt++;
+						}
+						if(cpt == 2) { // Pour que l'aide fonctionne il faut 2 lettres correcte
+							var helpmsg = { from: null, to: msg.from, text: "Vous êtes proche de la solution !", date: Date.now() };
+							io.sockets.emit("message", helpmsg, num);
+						}
+					}
+				}
+			}
 		}
 		else {
 			msg.text = msg.from+" à trouvé !";
@@ -131,6 +161,7 @@ io.on('connection', function (socket) {
 			io.sockets.emit("playingBadSound", parseInt(Math.random()*7)+1, num);
 			serveur[num].oneLifeLeft = 0;
 		}
+		serveur[num].fini = true;
 		for (var i=0; i<serveur[num].joueurs.length; i++) {
 			if (serveur[num].vies[Object.keys(serveur[num].clients)[i]] != 0) {
 				if (i != serveur[num].player) {
@@ -184,7 +215,21 @@ io.on('connection', function (socket) {
 		if(serveur[num].player == serveur[num].joueurs.length-1) {
 			serveur[num].rounds--;
 			if(serveur[num].rounds == 0){
-				io.sockets.emit("endGame", num);
+				var maximum = 0;
+				var x = 0;
+				var gagnant = "";
+				var y = "";
+				for(var i=0; i<Object.keys(serveur[num].scores).length; i++) {
+					y = Object.keys(serveur[num].scores)[i];
+					if(serveur[num].joueurs.includes(y)) {
+						x = Object.values(serveur[num].scores)[i];
+						if(maximum < x) {
+							maximum = x;
+							gagnant = y;
+						}
+					}
+				}
+				io.sockets.emit("endGame", gagnant, maximum, num);
 				return;
 			}
 			serveur[num].player = 0;

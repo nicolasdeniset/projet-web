@@ -109,15 +109,22 @@ document.addEventListener("DOMContentLoaded", async function() {
 	/*
 	 * Fin de la partie, affichage du gagnant
 	 */
-	socket.on("endGame", function(num) {
+	socket.on("endGame", function(g, m, num) {
 		if(idGame == num) { // Vérification de l'identifiant de la partie
 			if(!userLeave) { // Si l'utilisateur ne s'est pas déconnecté avant on lui affiche le gagnant
 				var startRound = document.getElementById("startRound");
 				var shadow = document.getElementById("shadow");
 				shadow.style.display = "block";
 				startRound.style.display = "block";
-				startRound.innerHTML = "<p>Fin de la partie ! Le gagnant est :<br>Moi ! haha</p>";
-				speech("Fin de la partie ! Le gagnant est Moi ! haha"); // Utilisation de la synthèse vocale
+				pauseAudio();
+				if(m == 0) { // Personne n'a gagné
+					startRound.innerHTML = "<p>Personne n'a gagné vous êtes des nuls !</p>";
+					speech("Personne n'a gagné vous êtes des nuls !"); // Utilisation de la synthèse vocale
+				}
+				else {
+					startRound.innerHTML = "<p>Fin de la partie ! Le gagnant est :<br>"+g+" avec "+m+" points !</p>";
+					speech("Fin de la partie ! Le gagnant est "+g+" avec "+m+" points !"); // Utilisation de la synthèse vocale
+				}
 			}
 			clearTimeout(audioTimeout); // Suppresion du timer de l'audioPlay
 		}
@@ -151,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 	/*
 	 * Actualisation des listes de clients et de scores lors de déconnexion
 	 */
-	socket.on("disconnectListe", function(c,s, num) {
+	socket.on("disconnectListe", function(c, s, num) {
 		if(idGame == num) { // Vérification de l'identifiant de la partie
 			clients = c;
 			scores = s;
@@ -536,7 +543,14 @@ function message(txt) {
 			}
 		}
 		else { // Message d'information du serveur
-			document.getElementsByTagName("SECTION")[0].innerHTML += "<div style=\"color:red;\">"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+" - "+"[admin] : "+txt+"</div>";
+			if(t != null) {
+				if(t == user) {
+					document.getElementsByTagName("SECTION")[0].innerHTML += "<div style=\"color:blue;\">"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+" - "+"[admin] : "+txt+"</div>";
+				}
+			}
+			else {
+				document.getElementsByTagName("SECTION")[0].innerHTML += "<div style=\"color:red;\">"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+" - "+"[admin] : "+txt+"</div>";
+			}
 		}
 }
 
@@ -970,10 +984,18 @@ function playingAudio() {
 
 /* Fonction qui permet de remettre les audio au début s'ils sont terminés */
 function restartAudio() {
-	if(audioHelp.paused){ audioHelp.currentTime = 0 }
-	if(audioGood.paused){ audioGood.currentTime = 0 }
-	if(audioBad.paused){ audioBad.currentTime = 0 }
-	if(audioPlay.paused){ audioPlay.currentTime = 0 }
+	if(audioHelp.paused){ audioHelp.currentTime = 0; }
+	if(audioGood.paused){ audioGood.currentTime = 0; }
+	if(audioBad.paused){ audioBad.currentTime = 0; }
+	if(audioPlay.paused){ audioPlay.currentTime = 0; }
+}
+
+/* Fonction qui permet de mettre les audio en pause */
+function pauseAudio() {
+	audioHelp.pause();
+	audioGood.pause();
+	audioBad.pause();
+	audioPlay.pause();
 }
 
 /* Fonction qui permet d'utiliser la synthèse vocale si elle est disponible
