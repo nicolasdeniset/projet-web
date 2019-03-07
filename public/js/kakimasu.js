@@ -556,12 +556,14 @@ function message(txt) {
 
 /* Fonction qui permet d'envoyer des messages dans le chat */
 function send() {
-	userSending = true; // L'utilisateur essaye de trouvé la solution
 	if (vies != 0) { // L'utilisateur n'a plus la possibilité d'envoyer des messages si son nombre d'essaies est à zéro
-        	vies--;
 		var m = document.getElementById("monMessage").value;
-		socket.emit("message", { from: user, to: null, text: m, date: Date.now() }, idGame); // Envoie du message au serveur
-		document.getElementById("monMessage").value = "";	
+		if(m != "") {
+			userSending = true; // L'utilisateur essaye de trouvé la solution
+			vies--;
+			socket.emit("message", { from: user, to: null, text: m, date: Date.now() }, idGame); // Envoie du message au serveur
+			document.getElementById("monMessage").value = "";
+		}	
 	}
 }
 
@@ -1014,4 +1016,10 @@ function speech(x) {
 		enonciation.rate = 0.9;
 		window.speechSynthesis.speak (enonciation);
 	}
+}
+
+/* Fonction qui permet de sauvegarder le profil d'un utilisateur et ses préférences lors de la création de partie */
+function sauvegarderProfil() {
+	var dateExpiration = Date.now();
+	dateExpiration.getDay() += 7; // Date d'expiration des cookies.
 }

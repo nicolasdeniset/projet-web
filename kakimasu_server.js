@@ -54,6 +54,7 @@ io.on('connection', function (socket) {
 		serveur[i].time = tab[2];
 		serveur[i].alphabet = tab[0];
 		serveur[i].joueurs = [];
+		serveur[i].scores = {};
 		socket.emit("num", i);
 	});
 	socket.on("randomGame", function() {
