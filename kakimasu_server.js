@@ -27,7 +27,7 @@ var partie = {
 	useHelp: false, // Booleen qui permet de savoir si l'utilisateur utilise l'aide
 	mot: "",		// Syllabe a trouver
 	player: 0,		// Compteur pour savoir qui doit dessiner
-	rounds: 2,		// Compteur du nombres de tours
+	rounds: 5,		// Compteur du nombres de tours
 	time: 30,		// Durée de chaques manches (en secondes)
 	fini: true,
 	alphabet: (Math.random() < 0.5) ? "hiragana" : "katakana", // Alphabet qui sera utilisé
@@ -50,21 +50,35 @@ io.on('connection', function (socket) {
 			i++;
 		}
 		serveur[i] = Object.create(partie);
-        serveur[i].rounds = tab[1];
+        	serveur[i].rounds = tab[1];
 		serveur[i].time = tab[2];
 		serveur[i].alphabet = tab[0];
 		serveur[i].joueurs = [];
 		serveur[i].scores = {};
+		serveur[i].vies = {};
+		serveur[i].arc_history = [];
+		serveur[i].clear_history = [];
 		socket.emit("num", i);
 	});
 	socket.on("randomGame", function() {
-		if (serveur.length == 0) {
+		console.log(serveur[0]);
+		if (serveur[0] == undefined) {
 			serveur[0] = Object.create(partie);
 		}
 		socket.emit("num", 0);
+	});
+	socket.on("recreate", function(num) {
+		serveur[num] = Object.create(partie);
+		serveur[num].rounds = 5;
+		serveur[num].time = 30;
+		serveur[num].joueurs = [];
+		serveur[num].scores = {};
+		serveur[num].vies = {};
+		serveur[num].arc_history = [];
+		serveur[num].clear_history = [];
 	});		
 
-    socket.on("login", function(id, num) {
+   	socket.on("login", function(id, num) {
 		console.log(id+" "+num);
         while (serveur[num].clients[id]) {
             id = id + "(1)";   

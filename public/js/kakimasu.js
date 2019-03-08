@@ -111,9 +111,9 @@ document.addEventListener("DOMContentLoaded", async function() {
 	 */
 	socket.on("endGame", function(g, m, num) {
 		if(idGame == num) { // Vérification de l'identifiant de la partie
+			var startRound = document.getElementById("startRound");
+			var shadow = document.getElementById("shadow");
 			if(!userLeave) { // Si l'utilisateur ne s'est pas déconnecté avant on lui affiche le gagnant
-				var startRound = document.getElementById("startRound");
-				var shadow = document.getElementById("shadow");
 				shadow.style.display = "block";
 				startRound.style.display = "block";
 				pauseAudio();
@@ -127,6 +127,22 @@ document.addEventListener("DOMContentLoaded", async function() {
 				}
 			}
 			clearTimeout(audioTimeout); // Suppresion du timer de l'audioPlay
+			setTimeout(function() {
+				shadow.style.display = "none";
+				startRound.style.display = "none";
+				startRound.innerHTML = "<p>Choisissez une syllabe à dessiner:</p><div id=\"syllabe1\"></div><div id=\"syllabe2\"></div><div id=\"syllabe3\"></div>";
+				var mot = document.getElementById("mot");
+				mot.innerHTML = "<p></p>";
+				socket.emit("logout", false, idGame); // Envoie au seuveur qu'il a quitté la partie
+				joinGame(); // Affichage du formulaire pour rejoindre une partie
+				document.getElementById("play").addEventListener("click", recuperationInfo, false); // L'utilisateur souhaite rejoindre une partie
+				document.getElementById("create").addEventListener("click", createForm, false); // L'utilisateur souhaite créer sa partie
+				document.getElementById("start").addEventListener("click", createGame, false); // Création de la partie de l'utilisateur
+				document.getElementById("back").addEventListener("click", joinGame, false); // L'utilisateur ne souhaite plus créer de partie.
+				if(userPlaying) {
+					socket.emit("recreate", idGame);
+				}
+			}, 20000);
 		}
 	});
 
@@ -470,6 +486,9 @@ function connect() {
 function recep() {
 	if (idGame != 0) { // Affichage du numéro de partie privé pour inviter ses amis
 		document.getElementById("numGame").innerHTML = "Numéro de Partie : " +idGame;
+	}
+	else {
+		document.getElementById("numGame").innerHTML = "";
 	}
 	socket.on("bienvenue", function(id) {
 		user = id; // Identifiant de l'utilisateur
@@ -819,7 +838,6 @@ function displayElement(x,y) {
 }
 
 function avatar() {
-
 	document.getElementById("flecheD1").addEventListener("click", function() {
 		if(avatarColor == 6){
 			avatarColor = 1;
@@ -830,7 +848,7 @@ function avatar() {
 		document.getElementById("colors").style.backgroundImage = "url(\"../images/avatar/color/"+avatarColor+".png\")";
 	}, false);
 	document.getElementById("flecheD2").addEventListener("click", function() {
-		if(avatarHair == 18){
+		if(avatarHair == 26){
 			avatarHair = 1;
 		}
 		else {
@@ -839,7 +857,7 @@ function avatar() {
 		document.getElementById("hairs").style.backgroundImage = "url(\"../images/avatar/hairs/"+avatarHair+".png\")";
 	}, false);
 	document.getElementById("flecheD3").addEventListener("click", function() {
-		if(avatarFace == 6){
+		if(avatarFace == 8){
 			avatarFace = 1;
 		}
 		else {
@@ -857,8 +875,8 @@ function avatar() {
 		document.getElementById("eyes").style.backgroundImage = "url(\"../images/avatar/eyes/"+avatarEyes+".png\")";
 	}, false);
 	document.getElementById("flecheD5").addEventListener("click", function() {
-		if(avatarBeard == 9){
-			avatarBeard = 0;
+		if(avatarBeard == 7){
+			avatarBeard = 1;
 		}
 		else {
 			avatarBeard++;
@@ -876,7 +894,7 @@ function avatar() {
 	}, false);
 	document.getElementById("flecheG2").addEventListener("click", function() {
 		if(avatarHair == 1){
-			avatarHair = 18;
+			avatarHair = 26;
 		}
 		else {
 			avatarHair--;
@@ -885,7 +903,7 @@ function avatar() {
 	}, false);
 	document.getElementById("flecheG3").addEventListener("click", function() {
 		if(avatarFace == 1){
-			avatarFace = 6;
+			avatarFace = 8;
 		}
 		else {
 			avatarFace--;
@@ -902,8 +920,8 @@ function avatar() {
 		document.getElementById("eyes").style.backgroundImage = "url(\"../images/avatar/eyes/"+avatarEyes+".png\")";
 	}, false);
 	document.getElementById("flecheG5").addEventListener("click", function() {
-		if(avatarBeard == 0){
-			avatarBeard = 9;
+		if(avatarBeard == 1){
+			avatarBeard = 7;
 		}
 		else {
 			avatarBeard--;
@@ -1018,8 +1036,3 @@ function speech(x) {
 	}
 }
 
-/* Fonction qui permet de sauvegarder le profil d'un utilisateur et ses préférences lors de la création de partie */
-function sauvegarderProfil() {
-	var dateExpiration = Date.now();
-	dateExpiration.getDay() += 7; // Date d'expiration des cookies.
-}
