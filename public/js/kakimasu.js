@@ -541,6 +541,7 @@ function letsgo() {
 	// Lancement de la partie
 	started = true;
 	socket.emit("go", idGame); // On envoie au serveur que la partie commence
+	document.getElementById("numGame").innerHTML = "";
 }
 
 /* Fonction qui permet d'afficher la liste des joueurs et leur score */

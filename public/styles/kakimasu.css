@@ -52,7 +52,7 @@ body {
 	z-index: 2;
 	border-radius: 10px;
 	border: solid 3px #000;
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 #syllabe1 p {
@@ -72,7 +72,7 @@ body {
 	z-index: 2;
 	border-radius: 10px;
 	border: solid 3px #000;
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 #syllabe2 p {
@@ -92,7 +92,7 @@ body {
 	z-index: 2;
 	border-radius: 10px;
 	border: solid 3px #000;
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 #syllabe3 p {
@@ -118,7 +118,7 @@ aside {
 	height: 70%;
 	width: 19%;
 	font-size: 40px;
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 aside div {
@@ -141,7 +141,7 @@ section {
 	left: 70%;
 	height: 63%;
 	width: 29%;
-	background-color: brown;
+	background-color: PeachPuff;
 	overflow: scroll;
 }
 
@@ -167,7 +167,7 @@ footer {
 	width: 5%;
 	border-radius: 10px;
 	border: solid 3px #000;
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 #mot p {
@@ -266,7 +266,7 @@ label {
 	height: 7%;
 	width: 29%;
 
-	background-color: brown;
+	background-color: PeachPuff;
 }
 
 #chat #monMessage {
